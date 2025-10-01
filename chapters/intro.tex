@@ -19,16 +19,35 @@
     Develop a Wazuh Platform tailored for district-level hospitals where all related types of logs can be received and monitored within the central dashboard, reinforcing the security of network assets.
     
 \subsection{\ifenglish In scope\else ในขอบเขต\fi}
-
+\begin{itemize}
+    \item{A Deployed Wazuh Instance: A fully configured, virtualized instance of Wazuh v4.12.}
+    \item{Custom Log Integration: The development of custom decoders and rules for one to two predefined, non-standard log sources relevant to a hospital environment.}
+    \item{Documentation: The creation of a detailed Deployment Guide document and a Final Project Report that includes the HAIT+ compliance mapping.}
+    \item{Attack Simulation: The execution of at least two scripted attack scenarios (e.g., simulated phishing credential entry, brute-force login attempt) to test the system's alerting capabilities.}
+\end{itemize}
 \subsection{\ifenglish Out of scope\else นอกขอบเขต\fi}
-
+\begin{itemize}
+    \item {Automated Response: While Wazuh's active response capabilities may be discussed, the project will not implement automated threat remediation actions. The focus remains on detection and alerting.}
+    \item{Live Deployment: The project will not be deployed in any live, operational hospital network. All work will be conducted within a controlled, virtualized test environment.}
+\end{itemize}
 \section{\ifenglish Expected outcomes\else ประโยชน์ที่ได้รับ\fi}
+\begin{itemize}
+    \item{Strengthened Data Security: Users will have access to improve data security, reducing the probability of cyber attacks, data breaches, and asset compromisation}
+    \item{Data-Driven Security Decision Making: With access to historical security data and trends, hospital management can make more informed decisions regarding IT security investments, resource allocation, and policy changes.}
+    \item{Proactive Vulnerability Management: The system automatically scans monitored assets for known vulnerabilities (CVEs), providing IT staff with a prioritized list of systems that require patching.}
+\end{itemize}
 
 \section{\ifenglish Technology and tools\else เทคโนโลยีและเครื่องมือที่ใช้\fi}
-
-\subsection{\ifenglish Hardware technology\else เทคโนโลยีด้านฮาร์ดแวร์\fi}
-
-\subsection{\ifenglish Software technology\else เทคโนโลยีด้านซอฟต์แวร์\fi}
+\begin{enumerate}
+    \item{PC}
+    \item{Github}
+    \item{Ubuntu Server VM}
+    \item{Wazuh Version 4.12}
+    \item{Proxmox Open Source Virtualization Platform}
+    \item{VMware eXSI}
+    \item{Oracle Server VM}
+    \item{Linux Server VM}
+\end{enumerate}
 
 \section{\ifenglish Project plan\else แผนการดำเนินงาน\fi}
 
@@ -42,12 +61,52 @@
 \end{plan}
 
 \section{\ifenglish Roles and responsibilities\else บทบาทและความรับผิดชอบ\fi}
-อธิบายว่าในการทำงาน นศ. มีการกำหนดบทบาทและแบ่งหน้าที่งานอย่างไรในการทำงาน จำเป็นต้องใช้ความรู้ใดในการทำงานบ้าง
-
+\begin{tabularx}{\textwidth}{ | >{\columncolor{lightgray}}X | X | }
+    \hline
+    \textbf{Project Discussion} & 
+    \begin{tabular}{@{}l@{}} % Using a nested tabular for the list of names
+        Ken Tanapat Tarawatcharasart \\
+        Atthaporn Srikiaw \\
+        Yotsawin Thepkham
+    \end{tabular} \\
+    \hline
+    \textbf{Requirement Analysis} & 
+    \begin{tabular}{@{}l@{}}
+        Atthaporn Srikiaw \\
+        Yotsawin Thepkham
+    \end{tabular} \\
+    \hline
+    \textbf{System Design} & 
+    \begin{tabular}{@{}l@{}} % Using a nested tabular for the list of names
+        Ken Tanapat Tarawatcharasart \\
+        Atthaporn Srikiaw \\
+    \end{tabular} \\
+    \hline
+    \textbf{Prototype Implementation} & 
+    \begin{tabular}{@{}l@{}} % Using a nested tabular for the list of names
+        Ken Tanapat Tarawatcharasart \\
+        Atthaporn Srikiaw \\
+    \end{tabular} \\
+    \hline
+    \textbf{Presentation} & 
+    \begin{tabular}{@{}l@{}} % Using a nested tabular for the list of names
+        Ken Tanapat Tarawatcharasart \\
+        Atthaporn Srikiaw \\
+        Yotsawin Thepkham
+    \end{tabular} \\
+    \hline
+    \textbf{Final Report Documentation} & 
+    \begin{tabular}{@{}l@{}} % Using a nested tabular for the list of names
+        Ken Tanapat Tarawatcharasart \\
+        Atthaporn Srikiaw \\
+        Yotsawin Thepkham
+    \end{tabular} \\
+    \hline
+\end{tabularx}
 \section{\ifenglish%
 Impacts of this project on society, health, safety, legal, and cultural issues
 \else%
 ผลกระทบด้านสังคม สุขภาพ ความปลอดภัย กฎหมาย และวัฒนธรรม
 \fi}
 
-แนวทางและโยชน์ในการประยุกต์ใช้งานโครงงานกับงานในด้านอื่นๆ รวมถึงผลกระทบในด้านสังคมและสิ่งแวดล้อมจากการใช้ความรู้ทางวิศวกรรมที่ได้
+This project's aims to directly to the health and safety of patients by securing the digital infrastructure of healthcare facilities by strengthening the data security of each hospital's IT assets. This helps to prevent compromisation of assets which can lead to the malfunction of critical medical devices and directly endanger patients. Additionally, it provides cost-effective and enterprise-grade threat detection capabilities that addresses the financial and expertise gap, where it often leaves the smaller public healthcare facilities vulnerable.
