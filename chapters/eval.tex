@@ -3,5 +3,43 @@
 \else%
 \ifenglish System Evaluation\else การประเมินระบบ\fi
 \fi}
+\label{ch:evaluation}
 
-ในบทนี้จะทดสอบเกี่ยวกับการทำงานในฟังก์ชันหลักๆ
+% --- Section 4.1: Test Environment ---
+\section{Test Environment Setup}
+\label{sec:test-env}
+The evaluation was conducted in the virtual lab environment built on the Proxmox VE platform. The environment consisted of a central Wazuh server running on Ubuntu Server, an endpoint virtual machine running Windows 11, and a second endpoint virtual machine running Ubuntu Server. The OPNsense firewall was used as the representative network device for generating syslog data for the firewall-related test case.
+
+
+% --- Section 4.2: Test Case Execution and Results ---
+\section{Test Case Execution and Results}
+\label{sec:test-results}
+The four test cases defined in the methodology were executed sequentially. The success of each test was determined by the generation of a timely, accurate, and actionable alert within the Wazuh Dashboard.
+
+\subsection{Test Case 1: Brute-Force Attack Detection}
+\begin{itemize}
+    \item \textbf{Objective:} To verify the system's ability to detect and alert on a brute-force SSH login attempt against the Ubuntu server endpoint.
+    \item \textbf{Methodology:} A script was executed to attempt multiple SSH logins to the Ubuntu server with incorrect passwords over a short period.
+    \item \textbf{Results:} ...
+    Figure \ref{fig:brute-force-alert}
+\end{itemize}
+
+\subsection{Test Case 2: File Integrity Monitoring}
+\begin{itemize}
+    \item \textbf{Objective:} To validate the File Integrity Monitoring (FIM) module's ability to detect unauthorized modifications to critical system files on the Windows 11 endpoint.
+    \item \textbf{Methodology:} The C:Windows-System32-drivers-etc-hosts file on the Windows 11 machine was manually edited and saved.
+    \item \textbf{Results:} ...
+\end{itemize}
+
+\subsection{Test Case 3: Firewall Log Analysis}
+\begin{itemize}
+    \item \textbf{Objective:} To ensure the SIEM could successfully ingest, parse, and alert on syslog data from a network firewall.
+    \item \textbf{Methodology:} A rule was configured on the OPNsense firewall to block all traffic from a specific test IP address. Traffic was then generated from that IP address, triggering the "deny" rule.
+    \item \textbf{Results:} ...
+\end{itemize}
+\subsection{Test Case 4: Custom Log Analysis}
+\begin{itemize}
+    \item \textbf{Objective:} To verify the functionality of the custom-developed decoder for a non-standard log format.
+    \item \textbf{Methodology:} A log entry matching the custom format was manually written to a monitored log file on the Ubuntu server. The log simulated a hypothetical application event, such as "PatientRecordAccessed: User 'testuser' accessed record '12345'".
+    \item \textbf{Results:} \ref{fig:custom-log-alert}. 
+\end{itemize}

@@ -1,113 +1,65 @@
 \chapter{\ifenglish Background Knowledge and Theory\else ทฤษฎีที่เกี่ยวข้อง\fi}
 
-การทำโครงงาน เริ่มต้นด้วยการศึกษาค้นคว้า ทฤษฎีที่เกี่ยวข้อง หรือ งานวิจัย/โครงงาน ที่เคยมีผู้นำเสนอไว้แล้ว ซึ่งเนื้อหาในบทนี้ก็จะเกี่ยวกับการอธิบายถึงสิ่งที่เกี่ยวข้องกับโครงงาน เพื่อให้ผู้อ่านเข้าใจเนื้อหาในบทถัดๆ ไปได้ง่ายขึ้น
+This chapter provides a comprehensive review of the foundational concepts related to Security Information and Event Management (SIEM). It begins by defining SIEM and its importance in modern cybersecurity, then delves into the core components and operational workflow of a typical SIEM system. Furthermore, it examines the specific applications and challenges of implementing SIEM solutions within the healthcare sector, concluding with a brief overview of prominent technologies in the field.
 
-\section{The first section}
-The text for Section 1 goes here.
+% --- Section 2.1: Defining SIEM ---
+\section{Security Information and Event Management}
+\label{sec:what-is-siem}
+Security Information and Event Management (SIEM) represents a comprehensive approach to security by combining the functions of Security Information Management (SIM) and Security Event Management (SEM). The primary goal of a SIEM system is to provide a holistic view of an organization's information security posture by collecting, aggregating, and analyzing log data from a multitude of sources in real-time. This centralized analysis enables security teams to detect potential threats, investigate security incidents, and generate reports for compliance purposes. According to the National Institute of Standards and Technology (NIST), effective log management, which is the core of SIEM, is essential for identifying and responding to security incidents in a timely manner \cite{nist_sp800-92}.
 
-\section{Second section}
-Section 2 text.
 
-\subsection{Subsection heading goes here}
+% --- Section 2.2: Core Components of a SIEM System ---
+\section{Core Components of a SIEM System}
+\subsection{Log Collection and Aggregation}
+\label{sec:siem-components}
+The foundational stage of any SIEM operation is the collection of log and event data from a wide array of sources across the IT infrastructure. These sources, often referred to as log sources, include network devices (firewalls, routers, switches), servers (Windows, Linux), applications (databases, web servers), and security solutions (antivirus, intrusion detection systems). The SIEM system uses agents or agentless collection methods to pull this data into a central repository. This aggregation is critical, as it creates a single, unified dataset for analysis.\cite{chapple_cybersecurity}
 
-Subsection 1 text
+\subsection{Data Normalization and Parsing}
+Log data from different vendors and systems comes in a multitude of proprietary and standard formats. For the SIEM to analyze this disparate information, it must first be normalized. Normalization is the process of parsing the raw log data and converting it into a common, structured format. For example, usernames, IP addresses, and event timestamps are extracted from various log formats and mapped to standard fields. This ensures that an event from a firewall can be directly compared and correlated with an event from a Windows server.
 
-\subsubsection{Subsubsection 1 heading goes here}
-Subsubsection 1 text
+\subsubsection{Threat Detection and Log Correlation}
+This is the core analytical engine of the SIEM. The system employs a correlation engine that uses a set of rules to analyze the normalized data in real-time. These rules are designed to identify patterns indicative of suspicious or malicious activity that would be invisible when looking at logs from a single source. For instance, a correlation rule might trigger an alert if it detects a user logging in from two different geographical locations within an impossible timeframe, or if it sees a brute-force attack on a server followed by a successful login and data exfiltration to an external IP address.
 
-\subsubsection{Subsubsection 2 heading goes here}
-Subsubsection 2 text
 
-\section{Third section}
-Section 3 text. The dielectric constant\index{dielectric constant}
-at the air-metal interface determines
-the resonance shift\index{resonance shift} as absorption or capture occurs
-is shown in Equation~\eqref{eq:dielectric}:
+\subsubsection{Alerting and Incident Response}
+When the correlation engine identifies a potential security incident, it generates an alert. These alerts are presented to security analysts through a dashboard or console and are typically prioritized based on severity (e.g., Low, Medium, High, Critical). This allows analysts to focus on the most pressing threats first. Modern SIEMs often integrate with Security Orchestration, Automation, and Response (SOAR) platforms to automate initial response actions, such as blocking an IP address at the firewall or disabling a compromised user account.
 
-\begin{equation}\label{eq:dielectric}
-k_1=\frac{\omega}{c({1/\varepsilon_m + 1/\varepsilon_i})^{1/2}}=k_2=\frac{\omega
-\sin(\theta)\varepsilon_\mathit{air}^{1/2}}{c}
-\end{equation}
+\subsection{Reporting and Compliance}
+SIEM systems are instrumental in meeting regulatory compliance requirements, such as HIPAA, GDPR, and PCI-DSS. They provide long-term storage of log data for forensic analysis and can automatically generate reports tailored to specific compliance frameworks. These reports can be used to demonstrate to auditors that the organization has the necessary security controls in place for monitoring, alerting, and responding to security events.
 
-\noindent
-where $\omega$ is the frequency of the plasmon, $c$ is the speed of
-light, $\varepsilon_m$ is the dielectric constant of the metal,
-$\varepsilon_i$ is the dielectric constant of neighboring insulator,
-and $\varepsilon_\mathit{air}$ is the dielectric constant of air.
 
-\section{About using figures in your report}
+% --- Section 2.3: SIEM in the Healthcare Sector ---
+\section{SIEM in the Healthcare Sector}
+\label{sec:siem-in-healthcare}
+The healthcare sector presents a unique and highly challenging environment for cybersecurity. Healthcare organizations are prime targets for cyberattacks due to the high value of the data they possess, known as Protected Health Information (PHI). This data, which includes medical records, personal identification, and financial information, is lucrative on the black market. Furthermore, the IT infrastructure within hospitals is often a complex mix of standard corporate systems, specialized medical devices (such as MRI machines and infusion pumps), and Internet of Things (IoT) devices, many of which may have outdated operating systems and limited security capabilities \cite{kruse_healthcare_cybersecurity}.
 
-% define a command that produces some filler text, the lorem ipsum.
-\newcommand{\loremipsum}{
-  \textit{Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-  eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-  minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-  aliquip ex ea commodo consequat. Duis aute irure dolor in
-  reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-  pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-  culpa qui officia deserunt mollit anim id est laborum.}\par}
+Implementing a SIEM solution is critical for healthcare organizations to gain visibility into this complex environment. A SIEM can help by:
+\begin{itemize}
+    \item \textbf{Protecting Patient Data:} By monitoring access to databases and systems containing PHI, a SIEM can detect and alert on unauthorized access attempts or unusual data exfiltration patterns.
+    \item \textbf{Securing Medical Devices:} It can monitor network traffic from medical devices that cannot have security agents installed, identifying anomalous behavior that might indicate a compromise.
+    \item \textbf{Ensuring HAIT+ Compliance:} The Hospital IT Accreditation+ mandates strict security controls for protecting patient data. A SIEM provides the necessary audit trails, log retention, and real-time monitoring capabilities required to demonstrate compliance to auditors. For instance, it can track every instance a patient's record is accessed, providing an essential tool for privacy and security officers.
+\end{itemize}
 
-\begin{figure}
-  \centering
+% --- Section 2.4: Review of Existing SIEM Solutions ---
+\section{Review of Existing SIEM Solutions}
+The SIEM market consists of a wide range of solutions, from large-scale, enterprise-grade commercial platforms to flexible and highly customizable open-source projects. Understanding the landscape of these tools is essential for making informed decisions about security architecture.
+\subsection{Commercial SIEM Platforms}
+Commercial solutions are known for their comprehensive feature sets, dedicated support, and extensive integration capabilities. The leaders in this space are consistently evaluated by industry analysts based on their ability to execute and completeness of vision \cite{gartner_siem_2022}. Two of the most prominent are:
+\begin{itemize}
+    \item \textbf{Splunk Enterprise Security:} Often regarded as a market leader, Splunk is a powerful data platform with a specialized security module. It is renowned for its highly flexible Search Processing Language (SPL), which allows for deep data investigation, and its powerful visualization and dashboarding capabilities.
+    \item \textbf{IBM QRadar:} A mature and feature-rich SIEM platform that focuses heavily on security intelligence. It integrates real-time threat intelligence feeds and provides strong analytics for correlating events to identify complex, multi-stage attacks.
+\end{itemize}
 
-  \fbox{
-     \parbox{.6\textwidth}{\loremipsum}
-  }
+\subsection{Open-Source SIEM Solutions}
+Open-source tools offer a cost-effective and highly customizable alternative to commercial products, making them popular for organizations with strong in-house technical expertise.
+\begin{itemize}
+    \item \textbf{The ELK Stack:} This is not a SIEM out-of-the-box but a powerful combination of three open-source projects that form the foundation of many modern SIEMs: \textbf{E}lasticsearch (a search and analytics engine), \textbf{L}ogstash (a data processing pipeline), and \textbf{K}ibana (a data visualization tool). It requires significant customization to function as a full SIEM. \cite{elastic_stack}
+    \item \textbf{Wazuh:} A popular open-source security platform that provides SIEM and Extended Detection and Response (XDR) capabilities. It is built upon the ELK Stack and offers a comprehensive solution for threat detection, integrity monitoring, incident response, and compliance, making it a powerful free alternative to commercial platforms \cite{wazuh_docs}.
+\end{itemize}
 
-  % To include an image in the figure, say myimage.pdf, you could use
-  % the following code. Look up the documentation for the package
-  % graphicx for more information.
-  % \includegraphics[width=\textwidth]{myimage}
 
-  \caption[Sample figure]{This figure is a sample containing \gls{lorem ipsum},
-  showing you how you can include figures and glossary in your report.
-  You can specify a shorter caption that will appear in the List of Figures.}
-  \label{fig:sample-figure}
-\end{figure}
 
-Using \verb.\label. and \verb.\ref. commands allows us to refer to
-figures easily. If we can refer to Figures
-\ref{fig:walrus} and \ref{fig:sample-figure} by name in the {\LaTeX}
-source code, then we will not need to update the code that refers to it
-even if the placement or ordering of the figures changes.
-
-\loremipsum\loremipsum
-
-% This code demonstrates how to get a landscape table or figure. It
-% uses the package lscape to turn everything but the page number into
-% landscape orientation. Everything should be included within an
-% \afterpage{ .... } to avoid causing a page break too early.
-\afterpage{
-  \begin{landscape}
-  \begin{table}
-    \caption{Sample landscape table}
-    \label{tab:sample-table}
-
-    \centering
-
-    \begin{tabular}{c||c|c}
-        Year & A & B \\
-        \hline\hline
-        1989 & 12 & 23 \\
-        1990 & 4 & 9 \\
-        1991 & 3 & 6 \\
-    \end{tabular}
-  \end{table}
-  \end{landscape}
-}
-
-\loremipsum\loremipsum\loremipsum
-
-\section{Overfull hbox}
-
-When the \verb.semifinal. option is passed to the \verb.cpecmu. document class,
-any line that is longer than the line width, i.e., an overfull hbox, will be
-highlighted with a black solid rule:
-\begin{center}
-\begin{minipage}{2em}
-juxtaposition
-\end{minipage}
-\end{center}
+% --- Section 2.5: ISNE knowledge used, applied, or integrated in this project ---
 
 \section{\ifenglish%
 \ifcpe CPE \else ISNE \fi knowledge used, applied, or integrated in this project
@@ -116,8 +68,20 @@ juxtaposition
 \fi
 }
 
-อธิบายถึงความรู้ และแนวทางการนำความรู้ต่างๆ ที่ได้เรียนตามหลักสูตร ซึ่งถูกนำมาใช้ในโครงงาน
+\label{sec:coursework-integration}
 
+This project integrates key concepts and practical skills acquired from several core courses in the Information Systems and Network Engineering curriculum. The following areas of study were instrumental in the planning and design of this SIEM solution.
+
+\begin{description}
+    \item[Project Management] Applied in planning the system development process by setting clear objectives, organizing tasks, and monitoring progress to keep the project on schedule. This knowledge ensured a structured workflow, adherence to timelines, and the timely delivery of project milestones.
+
+    \item[Network Design] A strong understanding of network design was crucial for defining the assets within the hospital's network topology. This knowledge provides the foundation for identifying and managing assets effectively and ensures that the SIEM system is designed to be fully compatible with the existing network infrastructure.
+
+    \item[Asset Management] Learned in the Cybersecurity course, asset management is a fundamental process for this project. After obtaining a list of critical assets, we will evaluate and prioritize them to ensure the SIEM's monitoring capabilities are focused on the most valuable and sensitive resources within the healthcare environment.
+    
+\end{description}
+% --- Section 2.6: Extracurricular knowledge used, applied, or integrated in this project ---
+\break
 \section{\ifenglish%
 Extracurricular knowledge used, applied, or integrated in this project
 \else%
@@ -125,4 +89,15 @@ Extracurricular knowledge used, applied, or integrated in this project
 \fi
 }
 
-อธิบายถึงความรู้ต่างๆ ที่เรียนรู้ด้วยตนเอง และแนวทางการนำความรู้เหล่านั้นมาใช้ในโครงงาน
+\label{sec:extracurricular-knowledge}
+
+The successful implementation of this project also relied heavily on knowledge and skills acquired through self-study and practical experience with technologies outside the formal curriculum.
+
+
+\begin{description}
+    \item[Wazuh] Implemented as the core SIEM platform, Wazuh was used for log collection, analysis, and real-time alerting. It actively monitored server and network activity, detected anomalies, and generated alerts for suspicious events. By applying Wazuh, the project ensured that critical data within the test environment was continuously monitored, improving security visibility and enabling a rapid response capability to potential incidents.
+
+    \item[Proxmox] This virtualization management platform was used to create and manage the virtual machines for the entire project. Proxmox provided a safe, isolated environment for testing and deploying the Wazuh system without impacting any live systems. The platform's support for snapshots, backups, and resource management was instrumental in ensuring the reliability and efficiency of the development and testing environment.
+
+    \item[OPNsense] As an open-source firewall and network monitoring platform, OPNsense was used during the system evaluation phase. It enabled the simulation of realistic network traffic, controlled network access, and generated syslog data. This enabled thorough testing to verify that the Wazuh system correctly ingested firewall logs and triggered appropriate alerts, validating the system’s responsiveness in a controlled setting.
+\end{description}
