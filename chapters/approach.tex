@@ -40,14 +40,21 @@ The user-facing layer provides the tools for security analysts to interact with 
 % --- Section 3.2: Development Methodology ---
 \section{Development Methodology}
 \label{sec:dev-methodology}
-The project will follow a phased, iterative development methodology. The project is divided into five distinct phases:
+The project followed an iterative, exploratory methodology based on advisor feedback to first establish a working prototype on local machines before attempting a full server deployment.
 \begin{enumerate}
-    \item \textbf{Phase 1: Environment Setup:} Configure the Proxmox virtual environment, deploying one VM for the Wazuh server and separate VMs for the Windows 11 and Ubuntu endpoints.
-    \item \textbf{Phase 2: Platform Installation and Integration:} Install the latest stable version of the Wazuh platform. Integrate the chosen firewall (see Section \ref{sec:tools}) to forward syslog data.
-    % NOTE: Added custom decoder development to the plan.
-    \item \textbf{Phase 3: Rule and Decoder Development:} Deploy and configure agents. Develop one to two custom decoders for any unique log sources. Tune correlation rules to detect specific threats.
-    \item \textbf{Phase 4: Dashboard Customization:} Design and build custom dashboards in the Wazuh Dashboard to visualize key security events from all log sources.
-    \item \textbf{Phase 5: System Testing:} Execute the test cases defined in the evaluation plan (Section \ref{sec:evaluation}) to validate the system's effectiveness and document the results for Chapter 4.
+    \item \textbf{Initial Feasibility Testing (Local Deployment):} 
+      Per advisor recommendation, initial tests were conducted on local developer machines instead of the planned Proxmox server.
+     \begin{itemize}
+        \item Attempt 1 (macOS ARM): A deployment of Wazuh via Docker on an Apple M2 (ARM) machine was attempted. This failed, as the Wazuh dashboard would not run, likely due to underlying software incompatibilities with the ARM architecture.
+        \item Attempt 2 (Windows + Docker): A second attempt was made using Wazuh in Docker on a Windows machine. While the server ran, significant networking challenges prevented the agent (running in a separate VM) from communicating with the Docker-based server.
+    \end{itemize}
+    
+    \item \textbf{Successful Prototype Deployment (VM-based):} Based on the challenges in Phase 1, the strategy was revised. The Wazuh Server was deployed inside its own dedicated Ubuntu Server VM on a Windows laptop running VMware Workstation. This approach solved all networking and compatibility issues. The virtualized server could communicate cleanly with other agent VMs (e.g., Ubuntu agent, OPNsense agent) on the same host.
+
+    \item \textbf{Proof-of-Concept Validation:}  With a stable prototype running, the core functionalities were validated. This included confirming the dashboard was accessible, agents could connect, and a basic end-to-end alert (File Integrity Monitoring) could be successfully triggered and displayed.
+
+    \item \textbf{Future Work Planning:} The findings from the prototype were used to define the clear test cases (Brute-Force, Firewall Logs, Custom Healthcare Logs) to be fully implemented in the next semester's project.
+  
 \end{enumerate}
 
 
@@ -65,17 +72,15 @@ The project will leverage a combination of enterprise-grade and open-source soft
 
 % --- Section 3.4: System Evaluation Plan ---
 \section{System Evaluation Plan}
-\label{sec:evaluation}
-To validate the functionality of the implemented SIEM, a series of controlled tests will be conducted. This plan will be executed and the results analyzed in detail in Chapter 4.
+\label{sec:evaluationPlan}
+To validate the full functionality of the proposed SIEM system during the next project phase, a series of controlled tests is planned. The execution and results of the initial prototype validation conducted during this Project Survey course are detailed in Chapter \ref{ch:evaluation}. The full test plan includes:
 \begin{itemize}
-    \item \textbf{Test Case 1 (Brute-Force Attack):} A script will simulate repeated failed SSH login attempts on the Ubuntu server to test agent-based log detection.
-    \item \textbf{Test Case 2 (File Integrity Monitoring):} A critical configuration file on the Windows 11 endpoint will be modified to test the FIM capabilities.
-    % NOTE: Updated firewall test case to be generic.
-    \item \textbf{Test Case 3 (Firewall Log Analysis):} A specific "deny" rule on the integrated firewall (FortiGate or OPNsense) will be triggered to verify syslog ingestion and alerting.
-    % NOTE: Added a new test case for your custom decoder.
-    \item \textbf{Test Case 4 (Custom Log Analysis):} A custom log entry will be generated on a monitored endpoint. The expected outcome is a successful parse by the custom decoder, generating a specific, readable alert in the Wazuh Dashboard.
+    \item \textbf{Test Case 1 (Brute-Force Attack):} A script will simulate repeated failed SSH login attempts on the Ubuntu server to test agent-based log detection and correlation rules.
+    \item \textbf{Test Case 2 (File Integrity Monitoring):} Critical configuration files (e.g., on a Linux server or Windows endpoint) will be modified to test the FIM capabilities and alerting timeliness. (This was successfully prototyped, see Section \ref{sec:obj3-alert}).
+    \item \textbf{Test Case 3 (Firewall Log Analysis):} Specific "deny" or "allow" rules on an integrated firewall (e.g., FortiGate or OPNsense) will be triggered using crafted network traffic to verify syslog/agent log ingestion, parsing, and alerting for network events.
+ \item \textbf{Test Case 4 (Unsupported Log Integration):} Identify a relevant log source within the target environment (or a suitable simulation) that is not natively supported by Wazuh's default decoders. Develop and implement custom decoders and rules to correctly parse these logs and generate specific, meaningful alerts based on their content within the Wazuh Dashboard.
 \end{itemize}
-The timely and accurate generation of an alert will determine the success of each test.
+For each test case in the full implementation, the timely and accurate generation of an appropriate alert, along with correct data representation in the dashboard, will determine success.
 
 
 

@@ -5,41 +5,73 @@
 \fi}
 \label{ch:evaluation}
 
-% --- Section 4.1: Test Environment ---
+% --- Section 4.1: Test Environment Setup ---
 \section{Test Environment Setup}
-\label{sec:test-env}
-The evaluation was conducted in the virtual lab environment built on the Proxmox VE platform. The environment consisted of a central Wazuh server running on Ubuntu Server, an endpoint virtual machine running Windows 11, and a second endpoint virtual machine running Ubuntu Server. The OPNsense firewall was used as the representative network device for generating syslog data for the firewall-related test case.
+\label{sec:test-env-setup}
+The prototype validation was conducted in a local virtual lab environment using VMware Workstation, hosted on a team member's Windows laptop. This setup was adopted based on advisor feedback and initial feasibility tests (as described in Section \ref{sec:dev-methodology}), which revealed compatibility issues with ARM-based macOS and networking complexities with Docker Desktop deployments for this specific use case.
 
+The stable prototype environment consisted of:
+\begin{enumerate}
+    \item A \textbf{Wazuh Server VM} (running Ubuntu Server with all Wazuh components).
+    \item An \textbf{Ubuntu Server VM} (acting as a monitored "asset" with a Wazuh agent installed).
+    \item An \textbf{OPNsense Firewall VM} (acting as a monitored "network device" with a Wazuh agent installed via the \texttt{os-wazuh-agent} plugin).
+\end{enumerate}
+This VM-based setup provided a reliable and isolated network environment crucial for validating the core SIEM functionalities as required for the Project Survey course.
 
-% --- Section 4.2: Test Case Execution and Results ---
-\section{Test Case Execution and Results}
-\label{sec:test-results}
-The four test cases defined in the methodology were executed sequentially. The success of each test was determined by the generation of a timely, accurate, and actionable alert within the Wazuh Dashboard.
+% --- Section 4.2: Prototype Validation ---
+\section{Prototype Validation}
+\label{sec:prototype-validation}
+The prototype successfully achieved the core objectives set by the advisor for this Project Survey course: establishing a functional \textbf{Dashboard}, demonstrating basic \textbf{Log Collection}, and proving the feasibility of \textbf{Alerting}.
 
-\subsection{Test Case 1: Brute-Force Attack Detection}
+\subsection{Objective 1: Core Platform Deployment (Dashboard)}
+\label{sec:obj1-dashboard}
 \begin{itemize}
-    \item \textbf{Objective:} To verify the system's ability to detect and alert on a brute-force SSH login attempt against the Ubuntu server endpoint.
-    \item \textbf{Methodology:} A script was executed to attempt multiple SSH logins to the Ubuntu server with incorrect passwords over a short period.
-    \item \textbf{Results:} ...
-    Figure \ref{fig:brute-force-alert}
+    \item \textbf{Objective:} To deploy the Wazuh central components and verify the accessibility and stability of the user interface (Dashboard).
+    \item \textbf{Methodology:} The Wazuh server, indexer, and dashboard components were installed within the dedicated Ubuntu Server VM following official documentation. Access was tested from the host machine's web browser.
+    \item \textbf{Results:} \textbf{Success.} The Wazuh Dashboard was fully functional, stable, and accessible, providing the necessary central interface for monitoring.
 \end{itemize}
 
-\subsection{Test Case 2: File Integrity Monitoring}
+\subsection{Objective 2: Agent Connectivity (Log Collection)}
+\label{sec:obj2-agent}
 \begin{itemize}
-    \item \textbf{Objective:} To validate the File Integrity Monitoring (FIM) module's ability to detect unauthorized modifications to critical system files on the Windows 11 endpoint.
-    \item \textbf{Methodology:} The C:Windows-System32-drivers-etc-hosts file on the Windows 11 machine was manually edited and saved.
-    \item \textbf{Results:} ...
+    \item \textbf{Objective:} To confirm that agents deployed on simulated assets could successfully connect to the Wazuh server and send basic logs (Log Collection).
+    \item \textbf{Methodology:} Wazuh agents were installed on the Ubuntu Server VM and the OPNsense VM. Their connection status was monitored via the Wazuh Dashboard.
+    \item \textbf{Results:} \textbf{Success.} As shown in the picture, both the ubuntu-agent-01 and the OPNsense.internal agents successfully enrolled and maintained an "active" status in the Wazuh Dashboard. This confirmed the log collection pipeline was functional.
+    
+   \begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{images/active_agents.png}
+    \caption{Wazuh Dashboard showing active agents: ubuntu-agent-01 and OPNsense.internal.}
+    \label{fig:active_agents}
+\end{figure}
 \end{itemize}
 
-\subsection{Test Case 3: Firewall Log Analysis}
+\subsection{Objective 3: Proof-of-Concept Alerting (Alert)}
+\label{sec:obj3-alert}
 \begin{itemize}
-    \item \textbf{Objective:} To ensure the SIEM could successfully ingest, parse, and alert on syslog data from a network firewall.
-    \item \textbf{Methodology:} A rule was configured on the OPNsense firewall to block all traffic from a specific test IP address. Traffic was then generated from that IP address, triggering the "deny" rule.
-    \item \textbf{Results:} ...
+    \item \textbf{Objective:} To validate the end-to-end monitoring and alerting capability (Alert) using a fundamental SIEM use case. This serves as a proof-of-concept for Test Case 2 (File Integrity Monitoring) from the full evaluation plan.
+    \item \textbf{Methodology:} The File Integrity Monitoring module was configured within the Wazuh agent on the Ubuntu Server VM to monitor changes in the \texttt{/home/user/alert\_test} directory. A new file was then created within this directory to simulate a change.
+    \item \textbf{Results:} \textbf{Success.}The agent instantly detected the file addition. The corresponding log event was sent to the server, processed, and successfully triggered the predefined Wazuh rule "File added to the system" (Rule ID 554). This alert was clearly visible in the Wazuh Dashboard, confirming the alerting mechanism's feasibility.
+    \begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{images/ftm.png}
+    \caption{Wazuh Security Events view showing the successful detection of a file addition (Rule ID 554) via File Integrity Monitoring.}
+    \label{fig:fim_alert}
+\end{figure}
 \end{itemize}
-\subsection{Test Case 4: Custom Log Analysis}
+
+% --- Section 4.3: Conclusion and Future Work ---
+\section{Conclusion and Future Work Plan}
+\label{sec:prototype-conclusion}
+The prototype implementation successfully met the core requirements for the Project Survey course. A functional \textbf{Dashboard} was established, \textbf{Log Collection} from agents was verified, and the \textbf{Alerting} mechanism was proven feasible via the File Integrity Monitoring test.
+
+Critically, the initial deployment challenges encountered (detailed in Section \ref{sec:dev-methodology}) provided valuable insights, steering the project towards a stable VM-based deployment strategy for the prototype phase. This exploratory process is a key outcome of the survey course.
+
+This successful prototype provides a strong foundation for the full project implementation in the subsequent course. Future work will focus on:
 \begin{itemize}
-    \item \textbf{Objective:} To verify the functionality of the custom-developed decoder for a non-standard log format.
-    \item \textbf{Methodology:} A log entry matching the custom format was manually written to a monitored log file on the Ubuntu server. The log simulated a hypothetical application event, such as "PatientRecordAccessed: User 'testuser' accessed record '12345'".
-    \item \textbf{Results:} \ref{fig:custom-log-alert}. 
+    \item Implementing and validating the remaining test cases defined in Section \ref{sec:evaluationPlan} (Brute-Force Attack, Firewall Log Analysis, Custom Healthcare Log Analysis).
+    \item Developing the necessary custom decoders and rules for healthcare-specific logs.
+    \item Mapping the implemented Wazuh capabilities against the HAIT+ compliance framework requirements relevant to district hospitals.
+    \item Potentially scaling the deployment to a more robust server environment (such as the originally planned Proxmox).
+    \item Preparing documentation and procedures for deployment in the target hospital environment.
 \end{itemize}
