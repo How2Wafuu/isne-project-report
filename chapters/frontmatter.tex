@@ -3,26 +3,61 @@
 
 \ifproject
 \begin{abstractTH}
-โครงการนี้เสนอการออกแบบและการใช้งานระบบการจัดการข้อมูลและเหตุการณ์ด้านความปลอดภัย (SIEM) ที่ปรับแต่งให้ตรงตามข้อกำหนดเฉพาะของมาตรฐาน HAIT+ วัตถุประสงค์หลักคือการจัดหาโซลูชันแบบรวมศูนย์ที่มีประสิทธิภาพด้านต้นทุนสำหรับการตรวจสอบระบบสารสนเทศของโรงพยาบาล (HIS) และโครงสร้างพื้นฐานเครือข่ายที่สำคัญ วิธีการนี้เกี่ยวข้องกับการใช้งาน Wazuh ที่เป็นระบบ SIEM เป็นหลัก โดยกำหนดค่าให้รวบรวมบันทึกจากแหล่งข้อมูลที่สำคัญ รวมถึง Active Directory ไฟร์วอลล์ และอื่นๆ กฎการตรวจจับแบบกำหนดเองได้รับการพัฒนาขึ้นเพื่อให้ตรงกับข้อกำหนดของ HAIT+ โดยเฉพาะ โดยเน้นที่การใช้งานบัญชีผู้มีสิทธิ์พิเศษและความพยายามในการเข้าถึงโดยไม่ได้รับอนุญาตเพื่อให้มั่นใจในความสมบูรณ์ของข้อมูล
+โครงงานนี้นำเสนอการออกแบบ การนำไปใช้งาน และการประเมินผลระบบ Security Information and Event Management (SIEM) ที่ปรับแต่งขึ้นโดยใช้แพลตฟอร์มโอเพนซอร์ส Wazuh เพื่อทำให้การตรวจสอบความสอดคล้องด้านความมั่นคงปลอดภัยทางไซเบอร์สำหรับโรงพยาบาลชุมชนตามมาตรฐาน HAIT+ (Healthcare Accreditation Information Technology) เป็นไปโดยอัตโนมัติ เนื่องจากโรงพยาบาลที่มีทรัพยากรจำกัดมักขาดแคลนงบประมาณและความเชี่ยวชาญสำหรับระบบ SIEM เชิงพาณิชย์ โครงงานนี้จึงได้ออกแบบสถาปัตยกรรมที่คุ้มค่าซึ่งสามารถรวบรวมบันทึกข้อมูล (Log) จากโครงสร้างพื้นฐานที่สำคัญมาไว้ที่ศูนย์กลาง รวมถึงเซิร์ฟเวอร์ฐานข้อมูลทางการแพทย์ที่ใช้ระบบปฏิบัติการ Linux (MariaDB) และเครื่องคอมพิวเตอร์พนักงานที่ใช้ Windows
+ผลงานทางวิศวกรรมที่สำคัญคือไปป์ไลน์ ``Command-to-Rule'' ซึ่งเป็นระเบียบวิธีที่ปรับแต่งขึ้นโดยให้ Agent ที่ปลายทางรันคำสั่ง Shell เฉพาะที่เพื่อรวบรวมตัวชี้วัดการทำงาน (เช่น การใช้งานดิสก์ และภาระงานของ CPU) ซึ่งไม่ได้ถูกติดตามโดยค่าเริ่มต้นของ SIEM Decoder ไปป์ไลน์นี้จะนำเข้าผลลัพธ์เหล่านั้นในรูปแบบ Log ทั่วไป จากนั้นจึงนำไปประมวลผลผ่านกฎ XML ที่ใช้ RegEx บน Wazuh Manager ส่วนกลางเพื่อสร้างการแจ้งเตือนตามมาตรฐาน ในระหว่างการพัฒนาได้มีการแก้ไขปัญหาทางเทคนิคที่สำคัญสองประการ ได้แก่ ปัญหา Decoder Collision ซึ่ง Decoder เริ่มต้นของ Wazuh แยกแยะประเภท Log ข้อผิดพลาดที่สำคัญของ MariaDB ผิดพลาดไปเป็นเหตุการณ์ของ Apache web server ซึ่งได้รับการแก้ไขผ่าน Rule Hierarchy (กฎแบบ Parent-Child) และปัญหาความไม่เสถียรของ Microsoft Windows Event IDs ในระบบปฏิบัติการเวอร์ชันต่างๆ ซึ่งถูกแก้ไขโดยเปลี่ยนการตรวจสอบไฟร์วอลล์ไปเป็นการตรวจสอบการสร้างโปรเซส (Process Creation auditing - Event 4688) ทำให้สามารถตรวจจับได้โดยไม่ขึ้นกับเวอร์ชันของระบบปฏิบัติการ
+การประเมินผลระบบผ่านการจำลองการโจมตีแบบควบคุมยืนยันว่าระบบที่พัฒนาขึ้นสามารถครอบคลุมตัวชี้วัดความมั่นคงปลอดภัยไซเบอร์ของ HAIT+ ได้โดยตรงถึง \textbf{60\%} (15 จาก 25 ตัวชี้วัด) โดยแบ่งเป็นความครอบคลุมจากความสามารถเริ่มต้นของ Wazuh (32\%) การตั้งค่าแบบ Standalone ที่ปรับแต่งขึ้น (24\%) และกฎการหาความสัมพันธ์ระดับ Manager (4\%) สำหรับตัวชี้วัดอีก 40\% ที่เหลือ จำเป็นต้องมีการบูรณาการร่วมกับระบบภายนอก เช่น ระบบตรวจจับการบุกรุกเครือข่าย (NIDS) และฐานข้อมูลทรัพยากรบุคคลขององค์กร ซึ่งได้กำหนดไว้เป็นแนวทางการพัฒนาในอนาคต
 \end{abstractTH}
 
 \begin{abstract}
-This project proposes the design and implementation of a Security Information and Event Management (SIEM) system tailored to meet the specific requirements of the HAIT+ standard. The primary objective is to provide a cost-effective, centralized solution for monitoring critical hospital information systems (HIS) and network infrastructure. The methodology involves deploying Wazuh as the core SIEM system, configured to aggregate logs from essential sources including active directory, firewalls, and so on. Custom detection rules were developed to map specifically to HAIT+ requirements, focusing on privileged account usage and unauthorized access attempts to ensure data integrity.
+This project presents the design, implementation, and validation of a
+customized Security Information and Event Management (SIEM) system,
+built on the open-source Wazuh platform, to automate cybersecurity
+compliance monitoring for district hospitals under the HAIT+
+(Healthcare Accreditation Information Technology) standard. Recognizing
+that resource-constrained hospitals lack the budget and expertise for
+commercial SIEM solutions, this work engineers a cost-effective
+architecture capable of centralizing log collection from critical
+infrastructure, including a Linux-based medical database
+servers (MariaDB) and Windows staff workstations.
+
+A key engineering contribution is the ``Command-to-Rule'' pipeline, a
+custom methodology in which endpoint agents execute localized shell
+commands to gather operational metrics (such as disk utilization and CPU
+load) not natively tracked by default SIEM decoders. The pipeline
+ingests this output as generic logs, which are then parsed by custom
+RegEx-based XML rules on the central Wazuh Manager to generate
+compliance-specific alerts. Two significant technical challenges were
+overcome during implementation: a Decoder Collision problem, where
+Wazuh's built-in decoders misclassified critical MariaDB error logs as
+Apache web server events were resolved through Rule Hierarchy
+(Parent-Child rules); and the unreliability of Microsoft Windows Event
+IDs across OS versions were bypassed by shifting firewall monitoring to
+Process Creation auditing (Event 4688), providing version-agnostic
+detection.
+
+System validation through controlled attack simulations confirmed that
+the engineered solution achieves a \textbf{60\% direct compliance
+coverage rate} (15 out of 25 HAIT+ cybersecurity indicators), with
+coverage distributed across default Wazuh capabilities (32\%),
+standalone custom configurations (24\%), and manager-level correlation
+rules (4\%). The remaining 40\% of indicators require integration with
+external systems such as Network Intrusion Detection Systems (NIDS) and
+organizational HR databases, which are identified as future work.
 \end{abstract}
 
 \iffalse
 \begin{dedication}
 This document is dedicated to all Chiang Mai University students.
 
-Dedication page is optional.
+The dedication page is optional.
 \end{dedication}
 \fi % \iffalse
 
 \begin{acknowledgments}
-I would like to express my graditude to IT representatives of Maewang Hospital and Doi Saket Hospital for their able guidance and vision as contribution to the completion of this project.
+I would like to express my sincere gratitude to the IT representatives of Maewang Hospital and Doi Saket Hospital for their guidance, support, and valuable insights, which significantly contributed to the successful completion of this project.
 
 
-\acksign{2020}{5}{25}
+\acksign{2026}{3}{27}
 \end{acknowledgments}%
 \fi % \ifproject
 

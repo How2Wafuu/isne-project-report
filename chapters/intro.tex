@@ -1,13 +1,13 @@
 \chapter{\ifenglish Introduction\else บทนำ\fi}
 
 \section{\ifenglish Project rationale\else ที่มาของโครงงาน\fi}
-    District-level healthcare facilities face a critical cybersecurity crisis, as they are frequent targets holding sensitive data but lack the financial resources and specialized expertise to defend themselves effectively. Therefore, this project is essential because it will implement a fully configured, open-source Security Information and Event Management (SIEM) and XDR framework using Wazuh. This approach directly addresses how able Wazuh is to the compliance such as HAIT+, a crucial standard for hospitals to follow. Along with the deployment guidance of configurations within wazuh to meet the requirements.
+    District‑level healthcare facilities are facing a critical cybersecurity challenge. They are frequent targets of cyberattacks and are responsible for storing highly sensitive data, yet they typically lack both the financial resources and the specialized expertise required to implement robust security controls. This project addresses that gap by designing and deploying a fully configured, open‑source Security Information and Event Management (SIEM) and Extended Detection and Response (XDR) framework based on Wazuh. The proposed solution aims to evaluate the extent to which Wazuh can support compliance with healthcare security standards such as HAIT+, and to provide detailed deployment guidance and configuration recommendations within Wazuh to meet those requirements.
 
 \section{\ifenglish Objectives\else วัตถุประสงค์ของโครงงาน\fi}
     The primary objective of this project is to design, implement, and validate a customized Wazuh SIEM/XDR solution tailored to the specific security, compliance (HAIT+), and operational needs of a resource-limited district hospital.
 \begin{itemize}
 
-    \item {Assert management: To enable comprehensive visibility and monitoring of all IT assets within the hospital's network, including servers, workstations, network devices, and medical equipment, ensuring they are properly secured and compliant with security policies.}
+    \item {Asset management: To enable comprehensive visibility and monitoring of all IT assets within the hospital's network, including servers, workstations, network devices, and medical equipment, ensuring they are properly secured and compliant with security policies.}
     \item {Implement a Baseline Solution: To deploy and configure the latest stable version of Wazuh (v4.12) in a simulated environment based on the requirements.}
     \item {Create a Deployment Guide: To develop a comprehensive guide for IT personnel in under-resourced hospitals to perform a fresh installation of Wazuh.}
     \item {Enhance System Capability: To create and validate custom decoders and rules that allow Wazuh to ingest and analyze logs from specific, otherwise unsupported, devices commonly found in healthcare settings.}
@@ -40,10 +40,10 @@
 \section{\ifenglish Technology and tools\else เทคโนโลยีและเครื่องมือที่ใช้\fi}
 \begin{enumerate}
     \item{PC}
-    \item{Github}
+    \item{GitHub}
     \item{Ubuntu Server VM}
     \item{Wazuh Version 4.12}
-    \item{VMware eXSI}
+    \item{VMware ESXi}
     \item{Linux Server VM}
 \end{enumerate}
 

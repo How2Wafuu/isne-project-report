@@ -23,7 +23,7 @@ The implemented system relies on a multi-layered architecture designed for effic
 This foundational layer is responsible for gathering security telemetry directly from the hospital's infrastructure.
 \begin{itemize}
 \item \textbf{Endpoint Generation:} The host operating systems or specific applications generate security events. These are written to local logs (such as \texttt{/var/log/auth.log} or \texttt{/var/log/dpkg.log}) or manifest as system state changes.
-\item \textbf{Agent-based Collection (The Observer):} Lightweight Wazuh agents deployed on endpoints (Ubuntu 24.04 and Windows 11) operate as background services. Using the \texttt{} configuration block, agents continuously monitor targeted directories in real-time. For custom HAIT+ metrics, agents are configured to execute local shell commands (e.g., \texttt{df -P} or \texttt{uptime}) and capture the standard output.
+\item \textbf{Agent-based Collection (The Observer):} Lightweight Wazuh agents deployed on endpoints (Ubuntu 24.04 and Windows 11) operate as background services. Using the \texttt{<localfile>} configuration block, agents continuously monitor targeted directories in real-time. For custom HAIT+ metrics, agents are configured to execute local shell commands (e.g., \texttt{df -P} or \texttt{uptime}) and capture the standard output.
 \end{itemize}
 
 \subsection{Secure Transmission Layer}

@@ -2,30 +2,32 @@
 
 \section{\ifenglish Conclusions\else สรุปผล\fi}
 
-Wazuh has successfully modernized the HAIT+ cybersecurity framework by transitioning from a manual checklist to an automated, real-time SIEM alerting pipeline. By leveraging Wazuh, we have demonstrated that open-source architectures can provide a highly customizable, cost-effective solution tailored to the budget constraints of district hospitals. Ultimately, the "Command-to-Rule" pipeline ensures that hospital IT staff can independently adapt and scale their monitoring capabilities to meet the evolving demands of new medical software and system metrics.
+Wazuh has successfully modernized the HAIT+ cybersecurity framework by transitioning it from a manual checklist into an automated, real‑time SIEM alerting pipeline. Leveraging Wazuh demonstrates that open‑source architectures can provide a highly customizable and cost‑effective solution that aligns with the budget constraints of district‑level hospitals. Ultimately, the \textit{Command‑to‑Rule} pipeline enables hospital IT staff to independently adapt and scale their monitoring capabilities in response to the evolving demands of new medical software and system performance metrics.
 
 \section{\ifenglish Challenges\else ปัญหาที่พบและแนวทางการแก้ไข\fi}
 
-One of our core challenges was that out-of-the-box SIEMs don't inherently understand hospital-specific operational requirements. To solve this, we developed a 'Command-to-Rule Pipeline'. We set up the Wazuh agents to run localized scripts, ingest the output as generic logs, and then built custom RegEx rules on the manager to score the anomalies.
-This is highly scalable; if a hospital wants to monitor something new, we just swap the one-line shell command on the agent without rebuilding the core alerting architecture.
+One of the core challenges encountered in this project was that out‑of‑the‑box SIEM platforms do not inherently capture hospital‑specific operational requirements. To address this limitation, the \textit{Command‑to‑Rule} pipeline was developed. In this approach, Wazuh agents are configured to execute localized scripts, ingest the resulting output as generic logs, and apply custom regular‑expression (RegEx) rules on the manager to assign anomaly scores.
+
+This design is highly scalable. When a hospital requires monitoring of a new process or metric, the administrator only needs to modify a single shell command on the agent, without altering or rebuilding the core alerting architecture.
+
 \begin{itemize}
-\item \textbf{Challenge 1:} Decoder Collision (Log Misidentification)\\
- Wazuh's default decoders aggressively mislabeled MariaDB [ERROR] logs as Apache Web Server logs, silencing our critical database alerts.
+  \item \textbf{Challenge 1:} Misclassified Database Alerts \\
+  Critical database events were incorrectly parsed and ingested as Apache Web Server logs, resulting in the suppression of important database-related alerts.
 
-\textbf{Solution:} Implemented Rule Hierarchy (Parent-Child rules) to hijack the misclassified log and elevate it to a Level 9 Critical Alert based on specific database keywords.
-\begin{figure}[h!]
+  \textbf{Solution:} A hierarchical rule structure (parent–child rules) was implemented to intercept the misclassified logs and reclassify them as Level 9 critical alerts based on specific database-related keywords.
+  \begin{figure}[h!]
     \centering
-\includegraphics[width=\textwidth]{images/Challeng_10.png}
-\end{figure}
+    \includegraphics[width=\textwidth]{images/Challeng_10.png}
+  \end{figure}
 
-\item \textbf{Challenge 2:} Unreliable Windows Event IDs\\
-Microsoft frequently changes Event IDs during updates, making native firewall monitoring brittle across different OS versions
+  \item \textbf{Challenge 2:} Unreliable Windows Event IDs \\
+  Microsoft frequently modifies Event IDs during system updates, which reduces the reliability of native firewall monitoring mechanisms across different Windows versions.
 
-\textbf{Solution:} Shifted to Command-Line Auditing (Event 4688). By monitoring the actual commands typed (e.g., netsh advfirewall), the alert works across all Windows versions.
-\begin{figure}[h!]
+  \textbf{Solution:} The monitoring strategy was shifted to command-line auditing (Event ID 4688). By monitoring the actual commands executed (for example, \texttt{netsh advfirewall}), the alerting logic remains consistent and effective across all supported Windows versions.
+  \begin{figure}[h!]
     \centering
-\includegraphics[width=\textwidth]{images/Challenge_20.png}
-\end{figure}
+    \includegraphics[width=\textwidth]{images/Challenge_20.png}
+  \end{figure}
 \end{itemize}
 
 \section{\ifenglish%
