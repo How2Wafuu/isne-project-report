@@ -4,24 +4,318 @@ Text for the first appendix goes here.
 
 \section{Appendix section}
 
-Text for a section in the first appendix goes here.
+chapter{Source Code and Configurations}
+\label{app:source-code}
 
-test ทดสอบฟอนต์ serif ภาษาไทย
+This appendix contains the core configuration files and custom XML rule sets engineered to align the Wazuh SIEM with the HAIT+ compliance framework.
 
-\textsf{test ทดสอบฟอนต์ sans serif ภาษาไทย}
+\section{Central Manager Rules (\texttt{local\_rules.xml})}
+The following rule set was deployed on the Wazuh Manager to parse incoming agent telemetry, override default decoder collisions, and assign appropriate severity levels based on HAIT+ guidelines.
 
-\verb+test ทดสอบฟอนต์ teletype ภาษาไทย+
+\begin{verbatim}
+<group name="local,syslog,sshd,">
 
-\texttt{test ทดสอบฟอนต์ teletype ภาษาไทย}
+  <rule id="100001" level="5">
+    <if_sid>5716</if_sid>
+    <srcip>1.1.1.1</srcip>
+    <description>sshd: authentication failed from IP 1.1.1.1.</description>
+    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
+  </rule>
 
-\textbf{ตัวหนา serif ภาษาไทย \textsf{sans serif ภาษาไทย} \texttt{teletype ภาษาไทย}}
+  <rule id="100002" level="10">
+    <if_sid>5402</if_sid>
+    <field name="command">stop ufw</field>
+    <description>HAIT+ #11: SECURITY ALERT: Firewall (UFW) was manually stopped!</description>
+    <group>service_stop,pci_dss_10.6.1,ha_it_plus</group>
+  </rule>
 
-\textit{ตัวเอียง serif ภาษาไทย \textsf{sans serif ภาษาไทย} \texttt{teletype ภาษาไทย}}
+  <rule id="100003" level="7">
+    <if_sid>530</if_sid>
+    <match>ossec: output: 'df -P'</match>
+    <regex type="pcre2">\s([2-9][0-9]|100)%</regex>
+    <description>HAIT+ #2: WARNING: Disk usage is above 20% (Test Trigger)</description>
+    <group>ha_it_plus</group>
 
-\textbf{\textit{ตัวหนาเอียง serif ภาษาไทย \textsf{sans serif ภาษาไทย} \texttt{teletype ภาษาไทย}}}
+  </rule>
 
-\url{https://www.example.com/test_ทดสอบ_url}
+  <rule id="100004" level="10">
+    <if_sid>5402</if_sid>
+    <match>/etc/shadow</match>
+    <description>HAIT+ #14: SECURITY ALERT: Suspicious access to password hash file (Reconnaissance)</description>
+    <mitre>
+      <id>T1003.008</id>
+    </mitre>
+    <group>gdpr_IV_32.2,gpg13_7.8,ha_it_plus</group>
+  </rule>  
+
+  <rule id="100005" level="8">
+    <if_sid>530</if_sid>
+    <match>ossec: output: 'check_cpu_load'</match>
+    <regex type="pcre2">^\s*([2-9]\.[0-9]+|[1-9][0-9]+\.[0-9]+)</regex>
+    <description>HAIT+ #3: High CPU Load Average detected: $(ossec.output)</description>
+    <group>performance_anomaly,ha_it_plus</group>
+  </rule> 
+
+  <rule id="100006" level="7">
+    <if_sid>2900</if_sid>
+    <match>install|upgrade|remove</match>
+    <description>HAIT+ #12: System package modification detected (dpkg)</description>
+    <group>software_management,ha_it_plus</group>
+  </rule>
+  
+  <rule id="100007" level="9">
+    <match>MariaDB|MySQL|database|crashed</match>
+    <description>HAIT+ #16: Database Error or Critical Event detected</description>
+    <group>database_error,ha_it_plus</group>
+  </rule>
+
+  <rule id="100008" level="9">
+    <if_sid>30101</if_sid>
+    <match>MariaDB|MySQL|database|crashed</match>
+    <description>HAIT+ #16: Database Error detected (Apache Decoder Override)</description>
+    <group>database_error,ha_it_plus</group>
+  </rule>
+
+</group>
+
+
+<group name="windows,process_monitoring,">
+
+  <rule id="100099" level="0">
+    <if_sid>67027</if_sid>
+    <description>Silence generic process creation noise</description>
+  </rule>
+
+  <rule id="100055" level="10">
+    <if_sid>60003</if_sid>
+    <field name="win.system.eventID">^2082$</field>
+    <description>HAIT+ #18: SECURITY ALERT: Firewall Configuration Modified (Event 2082)</description>
+    <options>no_full_log</options>
+    <group>pci_dss_10.5.5,ha_it_plus</group>
+  </rule>
+
+  <rule id="100060" level="12">
+    <if_sid>100099</if_sid> 
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)save</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)HKLM</field>
+    <description>HAIT+ #14: CRITICAL: Attempt to dump Registry/Credentials</description>
+    <mitre>
+      <id>T1003</id>
+    </mitre>
+    <group>ha_it_plus</group>
+  </rule>
+
+  <rule id="100061" level="12">
+    <if_sid>100099</if_sid> 
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)firewall</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)off</field>
+    <description>HAIT+ #11: CRITICAL: Firewall disabled via command line</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+    <group>ha_it_plus</group>
+  </rule>
+
+  <rule id="100062" level="7">
+    <if_sid>530</if_sid>
+    <match>^ossec: output: 'check_win_disk_space': </match>
+    <regex type="pcre2">[0-9]\d.\d+%$</regex>
+    <description>HAIT+ #2: C: Drive free space less than 20%.</description>
+    <group>ha_it_plus</group>
+  </rule>
+
+  <rule id="100065" level="7">
+    <if_sid>530</if_sid>
+    <match>ossec: output: 'check_win_disk_space': </match>
+    <regex type="pcre2">\d+.\d+%$</regex>
+    <description>TEST: Disk Space Reported: $(ossec.output)</description>
+     <group>ha_it_plus</group>
+  </rule>
+
+</group>
+\end{verbatim}
+
+\section{Endpoint Agent Configuration (\texttt{ossec.conf})}
+The following configuration blocks represent the custom "Command-to-Rule" pipeline deployed on the endpoint agents. These blocks dictate which local files are monitored and which shell commands are executed to gather specific HAIT+ telemetry before forwarding the payloads to the Manager.
+
+\subsection{Ubuntu 24.04 LTS (Database Server)}
+The following snippet highlights the customized system resource auditing commands (HAIT+ \#2, \#3) and the unauthorized software patch monitoring (HAIT+ \#12) configured on the Linux agent.
+
+\begin{verbatim}
+<ossec_config>
+  <client>
+    <server>
+      <address>[YOUR_WAZUH_MANAGER_IP]</address>
+      <port>1514</port>
+      <protocol>tcp</protocol>
+    </server>
+    <enrollment>
+      <enabled>yes</enabled>
+      <agent_name>[YOUR_UBUNTU_AGENT_NAME]</agent_name>
+    </enrollment>
+  </client>
+
+  <localfile>
+    <log_format>command</log_format>
+    <command>df -P</command>
+    <frequency>43200</frequency>
+  </localfile>
+
+  <localfile>
+    <log_format>full_command</log_format>
+    <command>uptime | awk -F'load average:' '{ print $2 }' | cut -d, -f1</command>
+    <alias>check_cpu_load</alias>
+    <frequency>60</frequency>
+  </localfile>
+
+  <localfile>
+    <log_format>full_command</log_format>
+    <command>netstat -tulpn | sed 's/\([[:alnum:]]\+\)\ \+[[:digit:]]\+\ \+[[:digit:]]\+\ \+\(.*\):\([[:digit:]]*\)\ \+\([0-9\.\:\*]\+\).\+\ \([[:digit:]]*\/[[:alnum:]\-]*\).*/\1 \2 == \3 == \4 \5/' | sort -k 4 -g | sed 's/ == \(.*\) ==/:\1/' | sed 1,2d</command>
+    <alias>netstat listening ports</alias>
+    <frequency>360</frequency>
+  </localfile>
+
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/dpkg.log</location>
+  </localfile>
+</ossec_config>
+\end{verbatim}
+
+\subsection{Windows 11 (Staff Workstation)}
+The following snippet highlights the custom registry and directory monitoring blocks configured to detect unauthorized access to hospital staff endpoints.
+
+\begin{verbatim}
+<ossec_config>
+  <client>
+    <server>
+      <address>[YOUR_WAZUH_MANAGER_IP]</address>
+      <port>1514</port>
+      <protocol>tcp</protocol>
+    </server>
+    <crypto_method>aes</crypto_method>
+    <enrollment>
+      <enabled>yes</enabled>
+      <agent_name>[YOUR_WINDOWS_AGENT_NAME]</agent_name>
+    </enrollment>
+  </client>
+
+  <syscheck>
+    <disabled>no</disabled>
+    <directories check_all="yes" realtime="yes">C:\Users\Public\Documents</directories>
+    <directories check_all="yes" realtime="yes">C:\Users\[YOUR_USERNAME]\Documents</directories>
+  </syscheck>
+
+  <localfile>
+    <location>Microsoft-Windows-Windows Firewall With Advanced Security/Firewall</location>
+    <log_format>eventchannel</log_format>
+    <query>Event/System[EventID=2082]</query>
+  </localfile>
+</ossec_config>
+\end{verbatim}
+
+\section{Agent Internal Options (\texttt{local\_internal\_options.conf})}
+By default, Wazuh agents disable the execution of external commands defined in the \texttt{ossec.conf} file for security purposes. To enable the "Command-to-Rule" pipeline (such as the disk space and CPU load scripts), the following parameter must be explicitly overridden on the endpoint agents.
+
+\begin{verbatim}
+# local_internal_options.conf
+#
+# This file should be handled with care. It contains
+# run time modifications that can affect the use
+# of OSSEC. Only change it if you know what you
+# are doing. Look first at ossec.conf
+# for most of the things you want to change.
+#
+# This file will not be overwritten during upgrades
+# but will be removed when the agent is un-installed.
+logcollector.remote_commands=1
+\end{verbatim}
 
 \chapter{\ifenglish Manual\else คู่มือการใช้งานระบบ\fi}
+% --- Appendix B ---
+\label{app:manual}
 
-Manual goes here.
+This section outlines the basic operational procedures for hospital IT administrators to interact with the deployed SIEM environment, followed by a grouped implementation guide for maintaining and deploying custom HAIT+ security rules.
+
+% --- Part 1: Operational Procedures ---
+
+\section{Accessing the Dashboard}
+\begin{enumerate}
+    \item Open a supported web browser (Google Chrome or Mozilla Firefox recommended).
+    \item Navigate to the Wazuh Manager IP address provided during deployment (e.g., \texttt{https://<MANAGER\_IP>}).
+    \item Proceed past the self-signed certificate warning (if applicable in the local environment).
+    \item Enter the provided administrator credentials to access the central overview.
+\end{enumerate}
+
+\section{Monitoring HAIT+ Alerts}
+To view active security events and compliance violations:
+\begin{enumerate}
+    \item From the main dashboard page, click on the \textbf{Wazuh} logo in the top left corner to open the dropdown menu.
+    \item Navigate to \textbf{Modules} $\rightarrow$ \textbf{Security events}.
+    \item The events list will display real-time alerts. To filter specifically for HAIT+ compliance alerts, click the \textbf{Add filter} button.
+    \item Set the filter field to \texttt{rule.groups}, the operator to \texttt{is}, and the value to \texttt{ha\_it\_plus}. Click \textbf{Save}.
+\end{enumerate}
+
+\section{Verifying Agent Status}
+To ensure all hospital endpoints are actively transmitting telemetry:
+\begin{enumerate}
+    \item Click on the \textbf{Wazuh} logo menu.
+    \item Select \textbf{Endpoints Summary}.
+    \item The panel displays all registered agents. Ensure the status for critical servers reads \textbf{Active}. If an agent shows as \textbf{Disconnected}, verify the network connection on the host machine and ensure the Wazuh service is running via the command \texttt{systemctl status wazuh-agent} (Linux) or via the Services app (Windows).
+\end{enumerate}
+
+% --- Part 2: Custom Rule Implementation Guide ---
+\section{Implementation Guide: Custom HAIT+ Rules}
+The custom HAIT+ rules engineered for this environment fall into three distinct implementation categories based on how the agent collects the telemetry. For the raw XML code blocks referenced in these steps, please refer to Appendix A.
+
+\subsection{Category 1: Static Log File Monitoring}
+This method is used when the endpoint naturally generates text-based log files (e.g., HAIT+ \#12 System Package Modification, HAIT+ \#16 Database Errors).
+
+\textbf{1. Agent-Side Implementation (e.g., Ubuntu)}
+\begin{itemize}
+    \item \textit{Prerequisite:} The parameter \texttt{logcollector.remote\_commands=1} must be set in the agent's \texttt{local\_internal\_options.conf} file to permit command execution.
+    
+    \item \textbf{Target File:} \texttt{/var/ossec/etc/ossec.conf}
+    \item \textbf{Action:} Add a \texttt{<localfile>} block. Set the \texttt{log\_format} to \texttt{syslog} and set the \texttt{<location>} to the absolute path of the target log file (e.g., \texttt{/var/log/dpkg.log} or \texttt{/var/log/mysql/error.log}).
+    \item \textbf{Execution:} Restart the agent service (\texttt{systemctl restart wazuh-agent}).
+\end{itemize}
+
+\textbf{2. Manager-Side Implementation}
+\begin{itemize}
+    \item \textbf{Target File:} \texttt{/var/ossec/etc/rules/local\_rules.xml}
+    \item \textbf{Action:} Append the corresponding custom rule (e.g., Rule 100006 or 100008). 
+    \item \textit{Note on Decoder Overrides:} If the log is being misclassified by default decoders (like MariaDB errors), ensure the \texttt{<if\_sid>} tag is set to the incorrect rule's ID (e.g., 30101) to hijack it and assign the correct HAIT+ severity.
+    \item \textbf{Execution:} Restart the manager service (\texttt{systemctl restart wazuh-manager}).
+\end{itemize}
+
+\subsection{Category 2: Active Command Execution (Command-to-Rule)}
+This method is used when the system does not natively log a required metric, requiring the agent to run a shell command to gather the data (e.g., HAIT+ \#2 Disk Usage, HAIT+ \#3 CPU Load).
+
+\textbf{1. Agent-Side Implementation}
+\begin{itemize}
+    \item \textbf{Target File:} \texttt{/var/ossec/etc/ossec.conf}
+    \item \textbf{Action:} Add a \texttt{<localfile>} block. Set the \texttt{log\_format} to \texttt{command} (or \texttt{full\_command}). Input the specific shell script in the \texttt{<command>} tag (e.g., \texttt{df -P}) and define the execution \texttt{<frequency>} in seconds.
+\end{itemize}
+
+\textbf{2. Manager-Side Implementation}
+\begin{itemize}
+    \item \textbf{Target File:} \texttt{/var/ossec/etc/rules/local\_rules.xml}
+    \item \textbf{Action:} Append the custom rule (e.g., Rule 100003). Use a \texttt{<regex type="pcre2">} tag to parse the exact value out of the command's standard output and trigger the alert if the threshold is breached.
+\end{itemize}
+
+\subsection{Category 3: Windows Event Channel Auditing}
+This method is used specifically for Windows endpoints interacting with the native Event Viewer API, utilizing Process Creation events to bypass unreliable Event IDs (e.g., HAIT+ \#11 Firewall Auditing, HAIT+ \#14 Reconnaissance).
+
+\textbf{1. Agent-Side Implementation (Windows 11)}
+\begin{itemize}
+    \item \textbf{Target File:} \texttt{C:\textbackslash Program Files (x86)\textbackslash ossec-agent\textbackslash ossec.conf}
+    \item \textbf{Action:} Ensure the \texttt{<localfile>} block for the \texttt{Security} event channel is active with the format set to \texttt{eventchannel}. 
+    \item \textit{Prerequisite:} Process Creation (Event 4688) must be enabled within the Windows Local Security Policy (\texttt{secpol.msc}) on the host machine to generate the required command-line telemetry.
+    \item \textbf{Execution:} Restart the Wazuh agent via the Windows Services management console.
+\end{itemize}
+
+\textbf{2. Manager-Side Implementation}
+\begin{itemize}
+    \item \textbf{Target File:} \texttt{/var/ossec/etc/rules/local\_rules.xml}
+    \item \textbf{Action:} Append the custom rule (e.g., Rule 100061). Use regex targeting the \texttt{win.eventdata.commandLine} field to intercept specific dangerous commands (e.g., \texttt{firewall} and \texttt{off}).
+\end{itemize}
