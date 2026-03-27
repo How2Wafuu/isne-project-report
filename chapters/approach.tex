@@ -5,82 +5,83 @@
 \fi
 }
 % --- Chapter Introduction ---
-This chapter outlines the architectural design of the proposed Security Information and Event Management (SIEM) system, the implementation methodology, the specific tools selected, and the plan for evaluating its effectiveness. The goal is to create a robust and scalable security monitoring solution tailored to the unique needs of a healthcare environment.
+This chapter outlines the architectural design of the Security Information and Event Management (SIEM) system, the implementation methodology, the specific tools selected, and the validation experiments performed to evaluate its effectiveness. The primary objective is to engineer a robust, scalable security monitoring solution explicitly tailored to meet the HAIT+ (Healthcare Accreditation Information Technology) cybersecurity guidelines for hospital environments.
 % --- Section 3.1: System Architecture ---
 \section{System Architecture}
 \label{sec:architecture}
-The proposed system is based on a multi-layered architecture designed for efficient data flow, from collection to visualization. This architecture, shown in Figure \ref{fig:system_architecture}, separates the core functions of the SIEM into distinct logical layers, ensuring modularity and scalability.
+The implemented system relies on a multi-layered architecture designed for efficient data flow, from endpoint telemetry generation to central visualization. This architecture, shown in Figure \ref{fig:system_architecture}, represents the functional proof-of-concept deployment. It separates the core functions of the SIEM into distinct logical layers, ensuring modularity and scalability for hospital IT environments.
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=\textwidth]{images/system_architecture.png} 
-    \caption{High-Level System Architecture of the Proposed SIEM Solution.}
+    % You can adjust the 0.9\textwidth if the image looks too big or small on the page
+    \includegraphics[width=0.9\textwidth]{images/system_architecture.png} 
+    \caption{System Architecture of the Implemented Proof-of-Concept SIEM Solution.}
     \label{fig:system_architecture}
 \end{figure}
 
-\subsection{Data Collection Layer}
-This foundational layer is responsible for gathering security data from a wide range of sources across the hospital's IT infrastructure. 
+\subsection{Data Collection Layer (The Endpoint and Agent)}
+This foundational layer is responsible for gathering security telemetry directly from the hospital's infrastructure.
 \begin{itemize}
-    \item \textbf{Agent-based Collection:} Lightweight Wazuh agents will be deployed on endpoints such as hospital servers (e.g., Hospital Web Server) and staff PCs. These agents perform real-time log data collection, file integrity monitoring, and vulnerability detection, forwarding the data securely to the central manager.
-    \item \textbf{Syslog Collection:} For network devices like firewalls and routers that cannot run a native agent, log data will be collected via the standard Syslog protocol. This ensures comprehensive visibility into network traffic and access control events.
+\item \textbf{Endpoint Generation:} The host operating systems or specific applications generate security events. These are written to local logs (such as \texttt{/var/log/auth.log} or \texttt{/var/log/dpkg.log}) or manifest as system state changes.
+\item \textbf{Agent-based Collection (The Observer):} Lightweight Wazuh agents deployed on endpoints (Ubuntu 24.04 and Windows 11) operate as background services. Using the \texttt{} configuration block, agents continuously monitor targeted directories in real-time. For custom HAIT+ metrics, agents are configured to execute local shell commands (e.g., \texttt{df -P} or \texttt{uptime}) and capture the standard output.
 \end{itemize}
 
-\subsection{Processing and Analysis Layer}
-The central server, referred to as the "Wazuh Central Component" in the architecture diagram, is the core of the SIEM. It processes and analyzes the raw data collected from the agents and syslog feeds.
+\subsection{Secure Transmission Layer}
+To maintain the integrity of hospital data, the Wazuh Agent compresses and encrypts the collected log payloads using AES encryption. The agent transmits this data over a secure TCP connection (Port 1514) to the central manager. If network connectivity drops, the agent queues logs locally and transmits them once the connection is restored, ensuring zero data loss.
+
+\subsection{Processing and Analysis Layer (The Brain)}
+The central server is the core of the SIEM. It processes the raw, encrypted data feeds from the agents.
 \begin{itemize}
-    \item \textbf{Wazuh Server:} This component receives the data, decodes and normalizes it, and analyzes it against a comprehensive rule set to identify security events, misconfigurations, and potential threats.
-    \item \textbf{Wazuh Indexer:} The processed and enriched data is then sent to the Wazuh indexer (powered by Elasticsearch). This component indexes the data, making it highly searchable and enabling rapid querying for threat hunting and historical analysis.
+\item \textbf{Wazuh Server (wazuh-analysisd):} The daemon decrypts incoming logs and processes them in three phases: Pre-decoding (extracting timestamps and hostnames), Decoding (identifying log types), and Rule Matching. The log is evaluated against custom HAIT+ XML rules. If it matches a threshold, a security alert is generated.
+\item \textbf{Wazuh Indexer:} Processed data is sent to the Elasticsearch-powered indexer, making it highly searchable for rapid threat hunting.
 \end{itemize}
 
 \subsection{Presentation and Alerting Layer}
-The user-facing layer provides the tools for security analysts to interact with the data and manage alerts.
 \begin{itemize}
-    \item \textbf{Wazuh Dashboard:} This web-based interface (powered by Kibana) provides a holistic view of the security environment. It offers customizable dashboards, visualizations, and reporting tools that allow analysts to monitor security events in real-time, investigate incidents, and demonstrate compliance.
+\item \textbf{Wazuh Dashboard:} A centralized web interface providing a holistic view of the hospital's security posture, enabling IT administrators to monitor real-time HAIT+ compliance events and investigate incidents.
 \end{itemize}
 
-% --- Section 3.2: Development Methodology ---
-\section{Development Methodology}
+% --- Section 3.2: Implementation Methodology ---
+\section{Implementation Methodology}
 \label{sec:dev-methodology}
-The project followed an iterative, exploratory methodology based on advisor feedback to first establish a working prototype on local machines before attempting a full server deployment.
+The project implementation moved beyond baseline installation to focus on advanced SIEM customization, addressing the specific operational requirements of a healthcare environment.
+
 \begin{enumerate}
-    \item \textbf{Initial Feasibility Testing (Local Deployment):} 
-      Per advisor recommendation, initial tests were conducted on local developer machines instead of the planned Proxmox server.
-     \begin{itemize}
-        \item Attempt 1 (macOS ARM): A deployment of Wazuh via Docker on an Apple M2 (ARM) machine was attempted. This failed, as the Wazuh dashboard would not run, likely due to underlying software incompatibilities with the ARM architecture.
-        \item Attempt 2 (Windows + Docker): A second attempt was made using Wazuh in Docker on a Windows machine. While the server ran, significant networking challenges prevented the agent (running in a separate VM) from communicating with the Docker-based server.
-    \end{itemize}
-    
-    \item \textbf{Successful Prototype Deployment (VM-based):} Based on the challenges in Phase 1, the strategy was revised. The Wazuh Server was deployed inside its own dedicated Ubuntu Server VM on a Windows laptop running VMware Workstation. This approach solved all networking and compatibility issues. The virtualized server could communicate cleanly with other agent VMs (e.g., Ubuntu agent, OPNsense agent) on the same host.
-
-    \item \textbf{Proof-of-Concept Validation:}  With a stable prototype running, the core functionalities were validated. This included confirming the dashboard was accessible, agents could connect, and a basic end-to-end alert (File Integrity Monitoring) could be successfully triggered and displayed.
-
-    \item \textbf{Future Work Planning:} The findings from the prototype were used to define the clear test cases (Brute-Force, Firewall Logs, Custom Healthcare Logs) to be fully implemented in the next semester's project.
-  
+\item \textbf{Baseline Deployment:} The core Wazuh Server was deployed alongside virtualized endpoint agents (Ubuntu 24.04 Server representing a medical database, and Windows 11 representing a staff workstation).
+\item \textbf{The "Command-to-Rule" Pipeline:} Because out-of-the-box SIEMs do not natively cover all HAIT+ guidelines (such as disk space exhaustion or CPU anomalies), a custom pipeline was engineered. Localized scripts were assigned to agents to check specific metrics. The output was ingested as generic logs, and custom RegEx rules were authored on the Manager to intercept and score these anomalies.
+\item \textbf{Overcoming Technical Constraints:} During implementation, several engineering challenges were addressed:
+\begin{itemize}
+\item \textbf{Decoder Collision:} Built-in decoders misclassified critical MariaDB \texttt{[ERROR]} logs as generic Apache web logs. This was resolved by implementing Rule Hierarchy (Parent-Child rules) to intercept the misclassified logs, scan for database-specific keywords, and elevate them to Critical Alerts.
+\item \textbf{Unreliable Windows Event IDs:} To counteract Microsoft's frequent deprecation of Event IDs during system updates, firewall monitoring was shifted to Command-Line Auditing (Event 4688). Monitoring the actual executed commands (e.g., \texttt{netsh advfirewall}) provided a version-agnostic security alert.
+\end{itemize}
 \end{enumerate}
 
 
 % --- Section 3.3: Tools and Technologies ---
 \section{Tools and Technologies}
 \label{sec:tools}
-The project will leverage a combination of enterprise-grade and open-source software to build a realistic security monitoring lab.
+The project leverages a combination of enterprise-grade and open-source software to build a highly capable, cost-effective security monitoring architecture.
 \begin{itemize}
-    \item \textbf{Virtualization Platform (Proxmox VE):} A powerful open-source virtualization platform will be used to host Wazuh and endpoint virtual machines.
-     \item \textbf{SIEM Platform (Wazuh v4.12):} The project will use Wazuh version 4.12, as specified in the project proposal. It was chosen for its comprehensive, open-source security features and its flexibility in allowing custom decoder and rule development.
-    \item \textbf{Endpoint Operating Systems:} To simulate a realistic environment, Wazuh agents will be tested on both \textbf{Windows 11} (representing user workstations) and \textbf{Ubuntu Server } (representing a web or database server).
-    % NOTE: This is the updated firewall section with the contingency plan.
-    \item \textbf{Network Firewall:} The primary goal is to integrate a physical \textbf{FortiGate firewall} as a log source to test the SIEM's ability to analyze data from an enterprise-grade device. As a contingency plan to ensure project completion in the event of access delays, an open-source \textbf{OPNsense firewall} will be configured in a virtual machine as a representative alternative for testing network log ingestion and analysis.
+\item \textbf{SIEM Platform (Wazuh):} Chosen for its open-source flexibility, lack of licensing costs, and extensible XML-based rule engine.
+\item \textbf{Endpoint Operating Systems:}
+\begin{itemize}
+\item \textbf{Ubuntu 24.04 LTS Server:} Used to host the medical database (MariaDB) and test Linux-based HAIT+ compliance indicators.
+\item \textbf{Windows 11:} Used to represent user workstations, testing native Antivirus integration (Windows Defender) and Process Creation auditing.
+\end{itemize}
 \end{itemize}
 
-% --- Section 3.4: System Evaluation Plan ---
-\section{System Evaluation Plan}
+% --- Section 3.4: System Validation Experiments ---
+\section{System Validation Experiments}
 \label{sec:evaluationPlan}
-To validate the full functionality of the proposed SIEM system during the next project phase, a series of controlled tests is planned. The execution and results of the initial prototype validation conducted during this Project Survey course are detailed in Chapter \ref{ch:evaluation}. The full test plan includes:
+To validate the functionality of the custom SIEM architecture, a series of experimental case studies was conducted. Each test targeted a specific HAIT+ indicator to ensure the pipeline (Endpoint → Agent → Server) operated correctly.
+
 \begin{itemize}
-    \item \textbf{Test Case 1 (Brute-Force Attack):} A script will simulate repeated failed SSH login attempts on the Ubuntu server to test agent-based log detection and correlation rules.
-    \item \textbf{Test Case 2 (File Integrity Monitoring):} Critical configuration files (e.g., on a Linux server or Windows endpoint) will be modified to test the FIM capabilities and alerting timeliness. (This was successfully prototyped, see Section \ref{sec:obj3-alert}).
-    \item \textbf{Test Case 3 (Firewall Log Analysis):} Specific "deny" or "allow" rules on an integrated firewall (e.g., FortiGate or OPNsense) will be triggered using crafted network traffic to verify syslog/agent log ingestion, parsing, and alerting for network events.
- \item \textbf{Test Case 4 (Unsupported Log Integration):} Identify a relevant log source within the target environment (or a suitable simulation) that is not natively supported by Wazuh's default decoders. Develop and implement custom decoders and rules to correctly parse these logs and generate specific, meaningful alerts based on their content within the Wazuh Dashboard.
+\item \textbf{Experiment 1: System Package Integrity (HAIT+ \#12):} To detect unauthorized patches, an \texttt{apt install} command was executed on the Ubuntu agent. The system successfully monitored \texttt{/var/log/dpkg.log}, parsing the install keyword and triggering custom Rule 100006.
+\item \textbf{Experiment 2: Database Reliability (HAIT+ \#16):} Simulated database crash logs were injected into the MariaDB error log. The system successfully bypassed the decoder collision utilizing Rule Hierarchy to generate a Level 9 alert.
+\item \textbf{Experiment 3: Resource Exhaustion (HAIT+ \#2, \#3):} Custom commands (\texttt{df -P} and \texttt{uptime}) were passed through the Command-to-Rule pipeline to successfully detect artificial spikes in CPU load and storage capacity.
+\item \textbf{Experiment 4: Reconnaissance Detection (HAIT+ \#14):} File Integrity Monitoring (FIM) was tested by attempting unauthorized access to the \texttt{/etc/shadow} file, generating a critical alert mapped to the MITRE ATT\&CK framework (T1003.008).
 \end{itemize}
-For each test case in the full implementation, the timely and accurate generation of an appropriate alert, along with correct data representation in the dashboard, will determine success.
+For each experiment, the timely generation of the correct custom alert on the Wazuh Dashboard confirmed the success of the implementation.
 
 
 

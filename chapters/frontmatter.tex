@@ -3,23 +3,11 @@
 
 \ifproject
 \begin{abstractTH}
-เขียนบทคัดย่อของโครงงานที่นี่
-
-การเขียนรายงานเป็นส่วนหนึ่งของการทำโครงงานวิศวกรรมคอมพิวเตอร์
-เพื่อทบทวนทฤษฎีที่เกี่ยวข้อง อธิบายขั้นตอนวิธีแก้ปัญหาเชิงวิศวกรรม และวิเคราะห์และสรุปผลการทดลองอุปกรณ์และระบบต่างๆ
-\enskip อย่างไรก็ดี การสร้างรูปเล่มรายงานให้ถูกรูปแบบนั้นเป็นขั้นตอนที่ยุ่งยาก
-แม้ว่าจะมีต้นแบบสำหรับใช้ในโปรแกรม Microsoft Word แล้วก็ตาม
-แต่นักศึกษาส่วนใหญ่ยังคงค้นพบว่าการใช้งานมีความซับซ้อน และเกิดความผิดพลาดในการจัดรูปแบบ กำหนดเลขหัวข้อ และสร้างสารบัญอยู่
-\enskip ภาควิชาวิศวกรรมคอมพิวเตอร์จึงได้จัดทำต้นแบบรูปเล่มรายงานโดยใช้ระบบจัดเตรียมเอกสาร
-\LaTeX{} เพื่อช่วยให้นักศึกษาเขียนรายงานได้อย่างสะดวกและรวดเร็วมากยิ่งขึ้น
+โครงการนี้เสนอการออกแบบและการใช้งานระบบการจัดการข้อมูลและเหตุการณ์ด้านความปลอดภัย (SIEM) ที่ปรับแต่งให้ตรงตามข้อกำหนดเฉพาะของมาตรฐาน HAIT+ วัตถุประสงค์หลักคือการจัดหาโซลูชันแบบรวมศูนย์ที่มีประสิทธิภาพด้านต้นทุนสำหรับการตรวจสอบระบบสารสนเทศของโรงพยาบาล (HIS) และโครงสร้างพื้นฐานเครือข่ายที่สำคัญ วิธีการนี้เกี่ยวข้องกับการใช้งาน Wazuh ที่เป็นระบบ SIEM เป็นหลัก โดยกำหนดค่าให้รวบรวมบันทึกจากแหล่งข้อมูลที่สำคัญ รวมถึง Active Directory ไฟร์วอลล์ และอื่นๆ กฎการตรวจจับแบบกำหนดเองได้รับการพัฒนาขึ้นเพื่อให้ตรงกับข้อกำหนดของ HAIT+ โดยเฉพาะ โดยเน้นที่การใช้งานบัญชีผู้มีสิทธิ์พิเศษและความพยายามในการเข้าถึงโดยไม่ได้รับอนุญาตเพื่อให้มั่นใจในความสมบูรณ์ของข้อมูล
 \end{abstractTH}
 
 \begin{abstract}
-The abstract would be placed here. It usually does not exceed 350 words
-long (not counting the heading), and must not take up more than one (1) page
-(even if fewer than 350 words long).
-
-Make sure your abstract sits inside the \texttt{abstract} environment.
+This project proposes the design and implementation of a Security Information and Event Management (SIEM) system tailored to meet the specific requirements of the HAIT+ standard. The primary objective is to provide a cost-effective, centralized solution for monitoring critical hospital information systems (HIS) and network infrastructure. The methodology involves deploying Wazuh as the core SIEM system, configured to aggregate logs from essential sources including active directory, firewalls, and so on. Custom detection rules were developed to map specifically to HAIT+ requirements, focusing on privileged account usage and unauthorized access attempts to ensure data integrity.
 \end{abstract}
 
 \iffalse
@@ -31,8 +19,8 @@ Dedication page is optional.
 \fi % \iffalse
 
 \begin{acknowledgments}
-Your acknowledgments go here. Make sure it sits inside the
-\texttt{acknowledgment} environment.
+I would like to express my graditude to IT representatives of Maewang Hospital and Doi Saket Hospital for their able guidance and vision as contribution to the completion of this project.
+
 
 \acksign{2020}{5}{25}
 \end{acknowledgments}%

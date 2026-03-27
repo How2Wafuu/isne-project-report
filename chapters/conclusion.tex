@@ -2,11 +2,31 @@
 
 \section{\ifenglish Conclusions\else สรุปผล\fi}
 
-นศ. ควรสรุปถึงข้อจำกัดของระบบในด้านต่างๆ ที่ระบบมีในเนื้อหาส่วนนี้ด้วย
+Wazuh has successfully modernized the HAIT+ cybersecurity framework by transitioning from a manual checklist to an automated, real-time SIEM alerting pipeline. By leveraging Wazuh, we have demonstrated that open-source architectures can provide a highly customizable and cost-effective solution specifically tailored for the budget constraints of district hospitals. Ultimately, the "Command-to-Rule" pipeline ensures that hospital IT staff can independently adapt and scale their monitoring capabilities to meet the evolving demands of new medical software and system metrics.
 
 \section{\ifenglish Challenges\else ปัญหาที่พบและแนวทางการแก้ไข\fi}
 
-ในการทำโครงงานนี้ พบว่าเกิดปัญหาหลักๆ ดังนี้
+One of our core challenges was that out-of-the-box SIEMs don't inherently understand hospital-specific operational requirements. To solve this, we developed a 'Command-to-Rule Pipeline'. We set up the Wazuh agents to run localized scripts, ingest the output as generic logs, and then built custom RegEx rules on the manager to score the anomalies.
+This is highly scalable; if a hospital wants to monitor something new, we just swap the one-line shell command on the agent without rebuilding the core alerting architecture.
+\begin{itemize}
+\item \textbf{Challenge 1:} Decoder Collision (Log Misidentification)\\
+ Wazuh's default decoders aggressively mislabeled MariaDB [ERROR] logs as Apache Web Server logs, silencing our critical database alerts.
+
+\textbf{Solution:} Implemented Rule Hierarchy (Parent-Child rules) to hijack the misclassified log and elevate it to a Level 9 Critical Alert based on specific database keywords.
+\begin{figure}[h!]
+    \centering
+\includegraphics[width=\textwidth]{images/Challeng_10.png}
+\end{figure}
+
+\item \textbf{Challenge 2:} Unreliable Windows Event IDs\\
+Microsoft frequently changes Event IDs during updates, making native firewall monitoring brittle across different OS versions
+
+\textbf{Solution:} Shifted to Command-Line Auditing (Event 4688). By monitoring the actual commands typed (e.g., netsh advfirewall), the alert works across all Windows versions.
+\begin{figure}[h!]
+    \centering
+\includegraphics[width=\textwidth]{images/Challenge_20.png}
+\end{figure}
+\end{itemize}
 
 \section{\ifenglish%
 Suggestions and further improvements
@@ -15,4 +35,11 @@ Suggestions and further improvements
 \fi
 }
 
-ข้อเสนอแนะเพื่อพัฒนาโครงงานนี้ต่อไป มีดังนี้
+While the current SIEM implementation successfully established a centralized monitoring baseline, several enhancements could further mature the system's capabilities. To achieve a more comprehensive defense-in-depth architecture and better align with broader cybersecurity compliance standards, the following future improvements by utilizing external tools are recommended.
+
+\item \textbf{Network Intrusion Detection (NIDS) Integration}\\
+Future iterations of the project should integrate dedicated NIDS, such as suricata or Zeek, alongside the existing Wazuh deployment. This integration would provide necessary telemetry to actively identify and resolve network congestion issues and unauthorized external device connections.
+\item \textbf{Context-Aware Access Control via Cross-Departmental APIs}\\
+A critical aspect of modern access con trol compliance is context. The SIEM's effectiveness can be significantly improved by shifting from static log analysis to dynamic, context-aware monitoring through API integrations with extertnal organizational databases. Which enables user access monitoring.
+\item \textbf{Physical and IoT Security Correlation}\\
+Comprehensive security monitoring must bridge the gap between logical and physical infrastructure. Future development should expand the SIEM's ingestion capabilities to include telemtry from IoT devices and data center hardware such as SNMP and PDUs, allowing detection of abnormal power resource usage.
