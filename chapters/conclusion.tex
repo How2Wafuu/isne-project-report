@@ -2,7 +2,7 @@
 
 \section{\ifenglish Conclusions\else สรุปผล\fi}
 
-Wazuh has successfully modernized the HAIT+ cybersecurity framework by transitioning from a manual checklist to an automated, real-time SIEM alerting pipeline. By leveraging Wazuh, we have demonstrated that open-source architectures can provide a highly customizable and cost-effective solution specifically tailored for the budget constraints of district hospitals. Ultimately, the "Command-to-Rule" pipeline ensures that hospital IT staff can independently adapt and scale their monitoring capabilities to meet the evolving demands of new medical software and system metrics.
+Wazuh has successfully modernized the HAIT+ cybersecurity framework by transitioning from a manual checklist to an automated, real-time SIEM alerting pipeline. By leveraging Wazuh, we have demonstrated that open-source architectures can provide a highly customizable, cost-effective solution tailored to the budget constraints of district hospitals. Ultimately, the "Command-to-Rule" pipeline ensures that hospital IT staff can independently adapt and scale their monitoring capabilities to meet the evolving demands of new medical software and system metrics.
 
 \section{\ifenglish Challenges\else ปัญหาที่พบและแนวทางการแก้ไข\fi}
 
@@ -37,9 +37,13 @@ Suggestions and further improvements
 
 While the current SIEM implementation successfully established a centralized monitoring baseline, several enhancements could further mature the system's capabilities. To achieve a more comprehensive defense-in-depth architecture and better align with broader cybersecurity compliance standards, the following future improvements by utilizing external tools are recommended.
 
+\begin{itemize}
 \item \textbf{Network Intrusion Detection (NIDS) Integration}\\
-Future iterations of the project should integrate dedicated NIDS, such as suricata or Zeek, alongside the existing Wazuh deployment. This integration would provide necessary telemetry to actively identify and resolve network congestion issues and unauthorized external device connections.
+Future iterations of the project should integrate dedicated NIDS, such as Suricata or Zeek, alongside the existing Wazuh deployment. This integration would provide necessary telemetry to actively identify and resolve network congestion issues and unauthorized external device connections.
+
 \item \textbf{Context-Aware Access Control via Cross-Departmental APIs}\\
-A critical aspect of modern access con trol compliance is context. The SIEM's effectiveness can be significantly improved by shifting from static log analysis to dynamic, context-aware monitoring through API integrations with extertnal organizational databases. Which enables user access monitoring.
+A critical aspect of modern access control compliance is context. The SIEM's effectiveness can be significantly improved by shifting from static log analysis to dynamic, context-aware monitoring via API integrations with external organizational databases, thereby enabling user access monitoring.
+
 \item \textbf{Physical and IoT Security Correlation}\\
-Comprehensive security monitoring must bridge the gap between logical and physical infrastructure. Future development should expand the SIEM's ingestion capabilities to include telemtry from IoT devices and data center hardware such as SNMP and PDUs, allowing detection of abnormal power resource usage.
+Comprehensive security monitoring must bridge the gap between logical and physical infrastructure. Future development should expand the SIEM's ingestion capabilities to include telemetry from IoT devices and data center hardware such as SNMP and PDUs, allowing detection of abnormal power resource usage.
+\end{itemize}
