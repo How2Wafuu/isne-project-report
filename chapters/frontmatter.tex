@@ -3,46 +3,11 @@
 
 \ifproject
 \begin{abstractTH}
-โครงงานนี้นำเสนอการออกแบบ การนำไปใช้งาน และการประเมินผลระบบ Security Information and Event Management (SIEM) ที่ปรับแต่งขึ้นโดยใช้แพลตฟอร์มโอเพนซอร์ส Wazuh เพื่อทำให้การตรวจสอบความสอดคล้องด้านความมั่นคงปลอดภัยทางไซเบอร์สำหรับโรงพยาบาลชุมชนตามมาตรฐาน HAIT+ (Healthcare Accreditation Information Technology) เป็นไปโดยอัตโนมัติ เนื่องจากโรงพยาบาลที่มีทรัพยากรจำกัดมักขาดแคลนงบประมาณและความเชี่ยวชาญสำหรับระบบ SIEM เชิงพาณิชย์ โครงงานนี้จึงได้ออกแบบสถาปัตยกรรมที่คุ้มค่าซึ่งสามารถรวบรวมบันทึกข้อมูล (Log) จากโครงสร้างพื้นฐานที่สำคัญมาไว้ที่ศูนย์กลาง รวมถึงเซิร์ฟเวอร์ฐานข้อมูลทางการแพทย์ที่ใช้ระบบปฏิบัติการ Linux (MariaDB) และเครื่องคอมพิวเตอร์พนักงานที่ใช้ Windows
-ผลงานทางวิศวกรรมที่สำคัญคือไปป์ไลน์ ``Command-to-Rule'' ซึ่งเป็นระเบียบวิธีที่ปรับแต่งขึ้นโดยให้ Agent ที่ปลายทางรันคำสั่ง Shell เฉพาะที่เพื่อรวบรวมตัวชี้วัดการทำงาน (เช่น การใช้งานดิสก์ และภาระงานของ CPU) ซึ่งไม่ได้ถูกติดตามโดยค่าเริ่มต้นของ SIEM Decoder ไปป์ไลน์นี้จะนำเข้าผลลัพธ์เหล่านั้นในรูปแบบ Log ทั่วไป จากนั้นจึงนำไปประมวลผลผ่านกฎ XML ที่ใช้ RegEx บน Wazuh Manager ส่วนกลางเพื่อสร้างการแจ้งเตือนตามมาตรฐาน ในระหว่างการพัฒนาได้มีการแก้ไขปัญหาทางเทคนิคที่สำคัญสองประการ ได้แก่ ปัญหา Decoder Collision ซึ่ง Decoder เริ่มต้นของ Wazuh แยกแยะประเภท Log ข้อผิดพลาดที่สำคัญของ MariaDB ผิดพลาดไปเป็นเหตุการณ์ของ Apache web server ซึ่งได้รับการแก้ไขผ่าน Rule Hierarchy (กฎแบบ Parent-Child) และปัญหาความไม่เสถียรของ Microsoft Windows Event IDs ในระบบปฏิบัติการเวอร์ชันต่างๆ ซึ่งถูกแก้ไขโดยเปลี่ยนการตรวจสอบไฟร์วอลล์ไปเป็นการตรวจสอบการสร้างโปรเซส (Process Creation auditing - Event 4688) ทำให้สามารถตรวจจับได้โดยไม่ขึ้นกับเวอร์ชันของระบบปฏิบัติการ
-การประเมินผลระบบผ่านการจำลองการโจมตีแบบควบคุมยืนยันว่าระบบที่พัฒนาขึ้นสามารถครอบคลุมตัวชี้วัดความมั่นคงปลอดภัยไซเบอร์ของ HAIT+ ได้โดยตรงถึง \textbf{60\%} (15 จาก 25 ตัวชี้วัด) โดยแบ่งเป็นความครอบคลุมจากความสามารถเริ่มต้นของ Wazuh (32\%) การตั้งค่าแบบ Standalone ที่ปรับแต่งขึ้น (24\%) และกฎการหาความสัมพันธ์ระดับ Manager (4\%) สำหรับตัวชี้วัดอีก 40\% ที่เหลือ จำเป็นต้องมีการบูรณาการร่วมกับระบบภายนอก เช่น ระบบตรวจจับการบุกรุกเครือข่าย (NIDS) และฐานข้อมูลทรัพยากรบุคคลขององค์กร ซึ่งได้กำหนดไว้เป็นแนวทางการพัฒนาในอนาคต
+โครงการนี้เสนอสถาปัตยกรรมระบบการจัดการข้อมูลและเหตุการณ์ด้านความปลอดภัย (SIEM) ที่คุ้มค่า ซึ่งสร้างขึ้นบนแพลตฟอร์มโอเพนซอร์ส Wazuh เพื่อทำการตรวจสอบมาตรฐานความปลอดภัยทางไซเบอร์ HAIT+ (Healthcare Accreditation Information Technology) ในโรงพยาบาลระดับอำเภอที่มีทรัพยากรจำกัดโดยอัตโนมัติ ระบบนี้รวมศูนย์การรวบรวมบันทึกข้อมูลจากโครงสร้างพื้นฐานที่สำคัญ รวมถึงฐานข้อมูลทางการแพทย์บนระบบ Linux (MariaDB) และเวิร์กสเตชัน Windows ส่วนสำคัญทางด้านวิศวกรรมคือไปป์ไลน์ “Command-to-Rule” ซึ่งใช้เอเจนต์ปลายทางในการรวบรวมเมตริกการดำเนินงานที่ไม่ได้รับการติดตามโดยตรง และแยกวิเคราะห์เมตริกเหล่านั้นผ่านกฎ XML ที่กำหนดเองสำหรับการแจ้งเตือนการปฏิบัติตามข้อกำหนด ความท้าทายในการใช้งาน เช่น การชนกันของตัวถอดรหัส MariaDB และรหัสเหตุการณ์ Windows ที่ไม่น่าเชื่อถือ ได้รับการแก้ไขโดยใช้ลำดับชั้นของกฎและการตรวจสอบการสร้างกระบวนการ (เหตุการณ์ 4688) การตรวจสอบความถูกต้องผ่านการจำลองการโจมตีแสดงให้เห็นอัตราความครอบคลุมการปฏิบัติตามข้อกำหนด\textbf{โดยตรง 60\%} (15 จาก 25 ตัวชี้วัด HAIT+) ส่วนที่เหลืออีก 40\% จำเป็นต้องมีการบูรณาการกับระบบภายนอกในอนาคต เช่น ระบบตรวจจับการบุกรุกเครือข่าย (NIDS) และฐานข้อมูลด้านทรัพยากรบุคคล
 \end{abstractTH}
 
 \begin{abstract}
-This project presents the design, implementation, and validation of a
-customized Security Information and Event Management (SIEM) system,
-built on the open-source Wazuh platform, to automate cybersecurity
-compliance monitoring for district hospitals under the HAIT+
-(Healthcare Accreditation Information Technology) standard. Recognizing
-that resource-constrained hospitals lack the budget and expertise for
-commercial SIEM solutions, this work engineers a cost-effective
-architecture capable of centralizing log collection from critical
-infrastructure, including a Linux-based medical database
-servers (MariaDB) and Windows staff workstations.
-
-A key engineering contribution is the ``Command-to-Rule'' pipeline, a
-custom methodology in which endpoint agents execute localized shell
-commands to gather operational metrics (such as disk utilization and CPU
-load) not natively tracked by default SIEM decoders. The pipeline
-ingests this output as generic logs, which are then parsed by custom
-RegEx-based XML rules on the central Wazuh Manager to generate
-compliance-specific alerts. Two significant technical challenges were
-overcome during implementation: a Decoder Collision problem, where
-Wazuh's built-in decoders misclassified critical MariaDB error logs as
-Apache web server events were resolved through Rule Hierarchy
-(Parent-Child rules); and the unreliability of Microsoft Windows Event
-IDs across OS versions were bypassed by shifting firewall monitoring to
-Process Creation auditing (Event 4688), providing version-agnostic
-detection.
-
-System validation through controlled attack simulations confirmed that
-the engineered solution achieves a \textbf{60\% direct compliance
-coverage rate} (15 out of 25 HAIT+ cybersecurity indicators), with
-coverage distributed across default Wazuh capabilities (32\%),
-standalone custom configurations (24\%), and manager-level correlation
-rules (4\%). The remaining 40\% of indicators require integration with
-external systems such as Network Intrusion Detection Systems (NIDS) and
-organizational HR databases, which are identified as future work.
+This project presents a cost-effective Security Information and Event Management (SIEM) architecture built on the open-source Wazuh platform to automate monitoring for the HAIT+ (Healthcare Accreditation Information Technology) cybersecurity standard in resource constrained district hospitals. The system centralizes log collection across critical infrastructure, including Linux-based medical databases (MariaDB) and Windows workstations. A key engineering contribution is the “Command-to-Rule” pipeline, which uses endpoint agents to gather operational metrics not natively tracked, parsing them via custom XML rules for compliance alerting. Implementation challenges, such as MariaDB decoder collisions and unreliable Windows Event IDs, were resolved using Rule Hierarchy and Process Creation auditing (Event 4688). Validation through attack simulations demonstrated a \textbf{60\% direct compliance coverage rate} (15 out of 25 HAIT+ indicators). The remaining 40\% requires future integration with external systems, such as Network Intrusion Detection Systems (NIDS) and HR databases.
 \end{abstract}
 
 \iffalse

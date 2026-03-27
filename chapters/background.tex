@@ -97,11 +97,11 @@ The successful implementation of this project also relied heavily on knowledge a
 \begin{description}
     \item[Wazuh] Implemented as the core SIEM platform, Wazuh was used for log collection, analysis, and real-time alerting. It actively monitored server and network activity, detected anomalies, and generated alerts for suspicious events. By applying Wazuh, the project ensured that critical data within the test environment was continuously monitored, improving security visibility and enabling a rapid response capability to potential incidents.
 
-    \item[Proxmox] This virtualization management platform was used to create and manage the virtual machines for the entire project. Proxmox provided a safe, isolated environment for testing and deploying the Wazuh system without impacting any live systems. The platform's support for snapshots, backups, and resource management was instrumental in ensuring the reliability and efficiency of the development and testing environment.
+    \item[VMware Workstation Pro] This Type-2 hosted hypervisor was used to create and manage the virtual machines for the entire project on local hardware. VMware Workstation Pro provided a safe, isolated environment for designing, testing, and validating the Wazuh SIEM deployment without requiring dedicated server infrastructure or impacting any live systems. The platform's support for virtual network configuration, snapshots, and resource allocation was instrumental in ensuring the reliability and reproducibility of the development and testing environment.
 
     \item[OPNsense] As an open-source firewall and network monitoring platform, OPNsense was used during the system evaluation phase. It enabled the simulation of realistic network traffic, controlled network access, and generated syslog data. This enabled thorough testing to verify that the Wazuh system correctly ingested firewall logs and triggered appropriate alerts, validating the system’s responsiveness in a controlled setting.
 \end{description}
 
 Having established the theoretical foundation and the specific tools selected,
-The following chapter details the system architecture and implementation
+the following chapter details the system architecture and implementation
 methodology employed to meet the HAIT+ compliance requirements.

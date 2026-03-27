@@ -80,7 +80,11 @@ The architecture was evaluated against specific HAIT+ compliance indicators usin
 \begin{itemize}
 \item \textbf{Objective:} Detect unauthorized security modifications on Windows endpoints without relying on unstable Windows Event IDs.
 \item \textbf{Execution:} A user attempted to disable the Windows Firewall via the command line interface on the Windows 11 agent.
-\item \textbf{Result:} \textbf{Success.} By monitoring Process Creation (Event ID 4688), the system captured the exact command executed (\texttt{firewall off}). Custom Rule 100061 parsed the regex payload and generated a Level 12 Critical Alert, proving the configuration is version-agnostic and highly resilient.
+\item \textbf{Result:} \textbf{Success.} By monitoring Process Creation
+(Event ID 4688) \cite{ms_event4688}, the system captured the exact command
+executed (\texttt{firewall off}). Custom Rule 100061 parsed the regex
+payload and generated a Level 12 Critical Alert, proving the configuration
+is version-agnostic and highly resilient.
 \end{itemize}
 \begin{figure}[h!]
     \centering
@@ -94,7 +98,9 @@ The architecture was evaluated against specific HAIT+ compliance indicators usin
 % --- Section 4.3: HAIT+ Compliance Coverage Analysis ---
 \section{HAIT+ Compliance Coverage Analysis}
 \label{sec:coverage-analysis}
-Following the successful validation of the custom rules and deployment architecture, a comprehensive analysis of the SIEM's effectiveness against the 25 total HAIT+ cybersecurity indicators was conducted.
+Following the successful validation of the custom rules and deployment
+architecture, a comprehensive analysis of the SIEM's effectiveness against
+the 25 total HAIT+ cybersecurity indicators \cite{hait_plus} was conducted.
 
 The engineered Wazuh implementation achieved a \textbf{60\% direct coverage rate (15 out of 25 indicators)}, drastically reducing the manual auditing workload for hospital IT staff. The coverage breakdown is as follows:
 \begin{itemize}

@@ -5,7 +5,13 @@
 \fi
 }
 % --- Chapter Introduction ---
-This chapter outlines the architectural design of the Security Information and Event Management (SIEM) system, the implementation methodology, the specific tools selected, and the validation experiments performed to evaluate its effectiveness. The primary objective is to engineer a robust, scalable security monitoring solution explicitly tailored to meet the HAIT+ (Healthcare Accreditation Information Technology) cybersecurity guidelines for hospital environments.
+This chapter outlines the architectural design of the Security Information
+and Event Management (SIEM) system, the implementation methodology, the
+specific tools selected, and the validation experiments performed to
+evaluate its effectiveness. The primary objective is to engineer a robust,
+scalable security monitoring solution explicitly tailored to meet the HAIT+
+(Healthcare Accreditation Information Technology) cybersecurity guidelines
+\cite{hait_plus} for hospital environments.
 % --- Section 3.1: System Architecture ---
 \section{System Architecture}
 \label{sec:architecture}
@@ -32,7 +38,11 @@ To maintain the integrity of hospital data, the Wazuh Agent compresses and encry
 \subsection{Processing and Analysis Layer (The Brain)}
 The central server is the core of the SIEM. It processes the raw, encrypted data feeds from the agents.
 \begin{itemize}
-\item \textbf{Wazuh Server (wazuh-analysisd):} The daemon decrypts incoming logs and processes them in three phases: Pre-decoding (extracting timestamps and hostnames), Decoding (identifying log types), and Rule Matching. The log is evaluated against custom HAIT+ XML rules. If it matches a threshold, a security alert is generated.
+\item \textbf{Wazuh Server (wazuh-analysisd):} The daemon decrypts incoming
+logs and processes them in three phases: Pre-decoding (extracting timestamps
+and hostnames), Decoding (identifying log types), and Rule Matching
+\cite{wazuh_architecture}. The log is evaluated against custom HAIT+ XML
+rules. If it matches a threshold, a security alert is generated.
 \item \textbf{Wazuh Indexer:} Processed data is sent to the Elasticsearch-powered indexer, making it highly searchable for rapid threat hunting.
 \end{itemize}
 
@@ -48,11 +58,21 @@ The project implementation moved beyond baseline installation to focus on advanc
 
 \begin{enumerate}
 \item \textbf{Baseline Deployment:} The core Wazuh Server was deployed alongside virtualized endpoint agents (Ubuntu 24.04 Server representing a medical database, and Windows 11 representing a staff workstation).
-\item \textbf{The "Command-to-Rule" Pipeline:} Because out-of-the-box SIEMs do not natively cover all HAIT+ guidelines (such as disk space exhaustion or CPU anomalies), a custom pipeline was engineered. Localized scripts were assigned to agents to check specific metrics. The output was ingested as generic logs, and custom RegEx rules were authored on the Manager to intercept and score these anomalies.
+\item \textbf{The ``Command-to-Rule'' Pipeline:} Because out-of-the-box
+SIEMs do not natively cover all HAIT+ guidelines (such as disk space
+exhaustion or CPU anomalies); a custom pipeline was engineered. Localized
+scripts were assigned to agents to check specific metrics. The output was
+ingested as generic logs, and custom rules utilizing PCRE2 regular
+expressions \cite{pcre2} were authored on the Manager to intercept and
+score these anomalies.
 \item \textbf{Overcoming Technical Constraints:} During implementation, several engineering challenges were addressed:
 \begin{itemize}
 \item \textbf{Decoder Collision:} Built-in decoders misclassified critical MariaDB \texttt{[ERROR]} logs as generic Apache web logs. This was resolved by implementing Rule Hierarchy (Parent-Child rules) to intercept the misclassified logs, scan for database-specific keywords, and elevate them to Critical Alerts.
-\item \textbf{Unreliable Windows Event IDs:} To counteract Microsoft's frequent deprecation of Event IDs during system updates, firewall monitoring was shifted to Command-Line Auditing (Event 4688). Monitoring the actual executed commands (e.g., \texttt{netsh advfirewall}) provided a version-agnostic security alert.
+\item \textbf{Unreliable Windows Event IDs:} To counteract Microsoft's
+frequent deprecation of Event IDs during system updates, firewall monitoring
+was shifted to Command-Line Auditing (Event 4688)
+\cite{ms_event4688}. Monitoring the actual executed commands (e.g.,
+\texttt{netsh advfirewall}) provided a version-agnostic security alert.
 \end{itemize}
 \end{enumerate}
 
@@ -79,7 +99,10 @@ To validate the functionality of the custom SIEM architecture, a series of exper
 \item \textbf{Experiment 1: System Package Integrity (HAIT+ \#12):} To detect unauthorized patches, an \texttt{apt install} command was executed on the Ubuntu agent. The system successfully monitored \texttt{/var/log/dpkg.log}, parsing the install keyword and triggering custom Rule 100006.
 \item \textbf{Experiment 2: Database Reliability (HAIT+ \#16):} Simulated database crash logs were injected into the MariaDB error log. The system successfully bypassed the decoder collision utilizing Rule Hierarchy to generate a Level 9 alert.
 \item \textbf{Experiment 3: Resource Exhaustion (HAIT+ \#2, \#3):} Custom commands (\texttt{df -P} and \texttt{uptime}) were passed through the Command-to-Rule pipeline to successfully detect artificial spikes in CPU load and storage capacity.
-\item \textbf{Experiment 4: Reconnaissance Detection (HAIT+ \#14):} File Integrity Monitoring (FIM) was tested by attempting unauthorized access to the \texttt{/etc/shadow} file, generating a critical alert mapped to the MITRE ATT\&CK framework (T1003.008).
+\item \textbf{Experiment 4: Reconnaissance Detection (HAIT+ \#14):} File
+Integrity Monitoring (FIM) was tested by attempting unauthorized access to
+the \texttt{/etc/shadow} file, generating a critical alert mapped to the
+MITRE ATT\&CK framework \cite{mitre_attack} (T1003.008).
 \end{itemize}
 For each experiment, the timely generation of the correct custom alert on the Wazuh Dashboard confirmed the success of the implementation.
 
